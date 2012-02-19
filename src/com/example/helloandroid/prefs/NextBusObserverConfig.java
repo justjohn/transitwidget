@@ -3,7 +3,13 @@
  */
 package com.example.helloandroid.prefs;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.example.helloandroid.NextBus;
+import com.example.helloandroid.feed.model.Agency;
+import com.example.helloandroid.feed.model.Direction;
+import com.example.helloandroid.feed.model.Route;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -38,10 +44,10 @@ public class NextBusObserverConfig {
 	private NextBusStop stop;
 	private List<NextBusStop> stops;
 
-	/** Milliseconds UTC Epoch */
-	private long startObserving;
-	/** Milliseconds UTC Epoch */
-	private long stopObserving;
+	/** Seconds in the day */
+	private int startObserving;
+	/** Seconds in the day */
+	private int stopObserving;
 
 	public NextBusObserverConfig(Context ctx, int widgetId) {
 		this.ctx = ctx;
@@ -53,8 +59,8 @@ public class NextBusObserverConfig {
 		this.direction = initValue(prefs, new NextBusDirection(),
 				PREF_DIRECTION);
 		this.stop = initValue(prefs, new NextBusStop(), PREF_STOP);
-		this.startObserving = prefs.getLong(PREF_START_OBSERVING, 0);
-		this.stopObserving = prefs.getLong(PREF_STOP_OBSERVING, 0);
+		this.startObserving = prefs.getInt(PREF_START_OBSERVING, 0);
+		this.stopObserving = prefs.getInt(PREF_STOP_OBSERVING, 0);
 	}
 
 	private <T extends NextBusValue> T initValue(SharedPreferences prefs, T v,
@@ -74,6 +80,8 @@ public class NextBusObserverConfig {
 		saveValue(prefs, this.route, PREF_ROUTE);
 		saveValue(prefs, this.direction, PREF_DIRECTION);
 		saveValue(prefs, this.stop, PREF_STOP);
+		prefs.putInt(PREF_START_OBSERVING, startObserving);
+		prefs.putInt(PREF_STOP_OBSERVING, stopObserving);
 
 		prefs.commit();
 	}
@@ -92,7 +100,12 @@ public class NextBusObserverConfig {
 	}
 
 	public List<NextBusAgency> getAgencies() {
-		// TODO Fetch from nextbus feed if first time.
+		if (agencies == null) {
+			agencies = new ArrayList<NextBusAgency>();
+			for (Agency model : NextBus.getAgencies()) {
+				agencies.add(new NextBusAgency().init(model));
+			}
+		}
 		return agencies;
 	}
 
@@ -106,13 +119,22 @@ public class NextBusObserverConfig {
 		}
 		modified = true;
 		agency = newAgency;
-		route = null;
-		direction = null;
-		stop = null;
+		clearRoute();
+	}
 
+	private void clearRoute() {
+		routes = null;
+		route = null;
+		clearDirection();
 	}
 
 	public List<NextBusRoute> getRoutes() {
+		if (routes == null && agency != null) {
+			routes = new ArrayList<NextBusRoute>();
+			for (Route model : NextBus.getRoutes(agency.getTag())) {
+				routes.add(new NextBusRoute().init(model));
+			}
+		}
 		return routes;
 	}
 
@@ -130,7 +152,19 @@ public class NextBusObserverConfig {
 		stop = null;
 	}
 
+	private void clearDirection() {
+		directions = null;
+		direction = null;
+		clearStop();
+	}
+
 	public List<NextBusDirection> getDirections() {
+		if (directions == null && routes != null && agency != null) {
+			directions = new ArrayList<NextBusDirection>();
+			for (Direction model : NextBus.getRouteConfig(agency.getTag(), route.getTag())) {
+				directions.add(new NextBusDirection().init(model));
+			}
+		}
 		return directions;
 	}
 
@@ -147,7 +181,24 @@ public class NextBusObserverConfig {
 		stop = null;
 	}
 
+	private void clearStop() {
+		stops = null;
+		stop = null;
+	}
+
 	public List<NextBusStop> getStops() {
+		if (stops == null && direction != null && getDirection() != null) {
+			// Stops are attached to directions in the route config, not fetched
+			// from the feed separately. Find the selected direction (this.direction
+			// might be from prefs, and thus not have the list of stops).
+			for (NextBusDirection d : directions) {
+				if (d.equals(direction)) {
+					stops = d.getStops();
+					return stops;
+				}
+			}
+		}
+		
 		return stops;
 	}
 
@@ -163,19 +214,19 @@ public class NextBusObserverConfig {
 		this.stop = stop;
 	}
 
-	public long getStartObserving() {
+	public int getStartObserving() {
 		return startObserving;
 	}
 
-	public void setStartObserving(long startObserving) {
+	public void setStartObserving(int startObserving) {
 		this.startObserving = startObserving;
 	}
 
-	public long getStopObserving() {
+	public int getStopObserving() {
 		return stopObserving;
 	}
 
-	public void setStopObserving(long stopObserving) {
+	public void setStopObserving(int stopObserving) {
 		this.stopObserving = stopObserving;
 	}
 
