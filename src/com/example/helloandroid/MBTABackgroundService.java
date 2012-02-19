@@ -114,6 +114,9 @@ public class MBTABackgroundService extends IntentService {
 		// Update widget
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(getApplicationContext(), PredictionWidgetProvider.class));
+		
+		// Un-comment when the preferences are finished
+		// int[] widgetIds = {widgetId};
 
 		Log.i(TAG, "Updating widgets: " + Arrays.asList(widgetIds));
 		
