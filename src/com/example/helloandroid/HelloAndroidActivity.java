@@ -1,18 +1,26 @@
 package com.example.helloandroid;
 
+import java.util.List;
+
+import com.example.helloandroid.feed.model.Agency;
+import com.example.helloandroid.feed.model.Direction;
+import com.example.helloandroid.feed.model.Route;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
 public class HelloAndroidActivity extends Activity {
-    /** Called when the activity is first created. */
+    private static final String TAG = HelloAndroidActivity.class.getName();
+
+	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,22 +34,15 @@ public class HelloAndroidActivity extends Activity {
         startAlarmButton.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
-//				long elapse_wakeup_time = SystemClock.elapsedRealtime() + 1 * 1000;
 				long now = System.currentTimeMillis();
 				
-				intent.putExtra(MBTABackgroundService.EXTRA_END_TIME, now + 30000);
-				
+				intent.putExtra(MBTABackgroundService.EXTRA_END_TIME, now + 5 * 60 * 1000);
+
 				PendingIntent pi = MBTABackgroundService.getPendingIntent(getApplicationContext(), intent);
 				
-//				alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, elapse_wakeup_time, pi);
-				
-				
-				
 				long trigger_time = now + 1000;
-				long interval = 10 * 1000;
+				long interval = 30 * 1000;
 				alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, trigger_time, interval , pi);
-				
-				
 			}
 		});
         

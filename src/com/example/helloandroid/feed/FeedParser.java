@@ -10,7 +10,11 @@ import java.util.Map;
 import org.xmlpull.v1.XmlPullParser;
 
 abstract class FeedParser {
-    
+	private static final String BASE_URL = "http://webservices.nextbus.com/service/publicXMLFeed";
+
+	public static final String ATTR_TAG = "tag";
+	public static final String ATTR_TITLE = "title";
+	
     final URL feedUrl;
 
     public FeedParser(String feedUrl) throws MalformedURLException {
@@ -30,4 +34,14 @@ abstract class FeedParser {
 		}	
 		return map;
     }
+
+	public static String getCommandUrl(String command) {
+		return BASE_URL + "?command=" + command;
+	}
+	public static String getCommandUrl(String command, String agency) {
+		return getCommandUrl(command) + "&a=" + agency;
+	}
+	public static String getCommandUrl(String command, String agency, String route) {
+		return getCommandUrl(command, agency) + "&r=" + route;
+	}
 }
