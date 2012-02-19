@@ -39,18 +39,45 @@ public class HelloAndroidActivity extends Activity {
         
         final Intent intent = MBTABackgroundService.createPredictionIntent( getApplicationContext(), 0);
         
+        new AsyncTask<Integer, String, String>() {
+        	@Override
+        	protected String doInBackground(Integer... params) {
+
+		        NextBusObserverConfig config = new NextBusObserverConfig(getApplicationContext(), params[0]);
+		        config.getAgencies();
+
+		        NextBusAgency agency = new NextBusAgency();
+		        agency.init("mbta", "mbta", "mbta");
+		        config.setAgency(agency);
+		        
+		        config.getRoutes();
+
+		        NextBusRoute route = new NextBusRoute();
+		        route.init("77", "77", "77");
+		        config.setRoute(route);
+		        
+		        config.getDirections();
+		        
+		        NextBusDirection direction = new NextBusDirection();
+		        direction.init("Arlington Heights via Mass. Ave.", "Arlington Heights via Mass. Ave.", "77_0_var0");
+		        config.setDirection(direction);
+		        
+		        Log.i(TAG, config.getStops().toString());
+		        
+        		return "";
+        	}
+        }.execute(0);
+        
+        
+        
+        
         startAlarmButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-
-				NextBusObserverConfig cfg = new NextBusObserverConfig(getApplicationContext(), 0);
-				cfg.save();
-				
 				Calendar cal = Calendar.getInstance();
 				cal.add(Calendar.SECOND, 5); // start 5 seconds from now
 
-
 				int trigger_time = getTimeFromBeginingOfDay(cal);
-				int end_time = trigger_time + 1 * 60 * 1000; // 1 minutes
+				int end_time = trigger_time + 60; // 1 minutes
 				
 				// PendingIntent pi = MBTABackgroundService.getPendingIntent(getApplicationContext(), intent);
 				

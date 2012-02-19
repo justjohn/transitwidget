@@ -61,6 +61,12 @@ public class NextBusObserverConfig {
 		this.stop = initValue(prefs, new NextBusStop(), PREF_STOP);
 		this.startObserving = prefs.getInt(PREF_START_OBSERVING, -1);
 		this.stopObserving = prefs.getInt(PREF_STOP_OBSERVING, -1);
+		
+		if (this.startObserving == this.stopObserving &&
+				this.startObserving != -1) {
+			this.startObserving = this.stopObserving = -1;
+			modified = true;
+		}
 	}
 
 	private <T extends NextBusValue> T initValue(SharedPreferences prefs, T v,
@@ -171,7 +177,7 @@ public class NextBusObserverConfig {
 	}
 
 	public List<NextBusDirection> getDirections() {
-		if (directions == null && routes != null && agency != null) {
+		if (directions == null && route != null && agency != null) {
 			directions = new ArrayList<NextBusDirection>();
 			for (Direction model : NextBus.getRouteConfig(agency.getTag(), route.getTag())) {
 				directions.add(new NextBusDirection().init(model));

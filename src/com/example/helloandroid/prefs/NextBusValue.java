@@ -41,6 +41,10 @@ public class NextBusValue {
 	public String getTag() {
 		return tag;
 	}
+	@Override
+	public String toString() {
+		return tag;
+	}
 
 	@Override
 	public int hashCode() {
