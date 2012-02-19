@@ -16,6 +16,11 @@ public class NextBusValue {
 	public void init(String shortLabel, String longLabel, String tag) {
 		this.shortLabel = shortLabel;
 		this.longLabel = longLabel;
+		if (shortLabel == null || shortLabel.isEmpty()) {
+			this.shortLabel = longLabel;
+		} else if (longLabel == null || longLabel.isEmpty()) {
+			this.longLabel = shortLabel;
+		}
 		this.tag = tag;
 	}
 	public void initFromPrefs(String prefsString) {
