@@ -23,11 +23,29 @@
             android:text="@string/cancelBtnLabel" />
 
         <TextView
-            android:id="@+id/routeLabel"
+            android:id="@+id/agencyLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:text="@string/agencyLabel"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Spinner
+            android:id="@+id/agencySpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/agencyLabel"
+            android:layout_marginLeft="26dp" />
+
+        <TextView
+            android:id="@+id/routeLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/agencySpinner"
+            android:layout_marginTop="18dp"
             android:text="@string/routeLabel"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -35,35 +53,16 @@
             android:id="@+id/routeSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/routeLabel"
-            android:layout_marginTop="15dp" />
-
-        <TextView
-            android:id="@+id/startPointLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/routeSpinner"
-            android:layout_marginTop="15dp"
-            android:text="@string/startPointLabel"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <Spinner
-            android:id="@+id/startPointSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/startPointLabel"
-            android:layout_marginTop="17dp" />
+            android:layout_alignLeft="@+id/agencySpinner"
+            android:layout_below="@+id/routeLabel" />
 
         <TextView
             android:id="@+id/endPointLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/startPointSpinner"
-            android:layout_marginTop="20dp"
+            android:layout_below="@+id/routeSpinner"
+            android:layout_marginTop="16dp"
             android:text="@string/endPointLabel"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -71,9 +70,8 @@
             android:id="@+id/endPointSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/endPointLabel"
-            android:layout_marginTop="22dp" />
+            android:layout_alignLeft="@+id/routeSpinner"
+            android:layout_below="@+id/endPointLabel" />
 
 </RelativeLayout>
 
