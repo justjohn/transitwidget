@@ -83,18 +83,18 @@ public class MBTABackgroundService extends IntentService {
 			return;
 		}
 		
-		BusPrediction nextPrediction;
-		BusPrediction secondPrediction;
+		BusPrediction nextPrediction = new BusPrediction();
+		BusPrediction secondPrediction = new BusPrediction();
 		
 		if (predictions.isEmpty()) {
 			Log.i(TAG, "No predictions available for selected route.");
 
-			nextPrediction = new BusPrediction();
-			secondPrediction = new BusPrediction();
 		} else {
 		
 			nextPrediction = predictions.get(0);
-			secondPrediction = predictions.get(1);
+			if (predictions.size() > 1) {
+				secondPrediction = predictions.get(1);
+			}
 			
 			int icon = android.R.drawable.ic_menu_compass;
 			CharSequence tickerText = predictions.toString();
