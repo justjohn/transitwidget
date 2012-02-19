@@ -42,6 +42,7 @@
                 android:resource="@xml/widget_info" />
         </receiver>
         <service android:name=".UpdateWidgetService" />
+        <service android:name=".service.AlarmSchedulerService" />
         
     </application>
 

@@ -4,9 +4,7 @@
 package com.example.helloandroid;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -22,8 +20,7 @@ import com.example.helloandroid.feed.model.Direction;
 import com.example.helloandroid.feed.model.Route;
 
 /**
- * @author james
- *
+ * Get results from the NextBus API.
  */
 public class NextBus {
 	private static final String TAG = NextBus.class.getName();
@@ -65,9 +62,9 @@ public class NextBus {
 			RouteListFeedParser parser = new RouteListFeedParser(agency);
 			data = parser.parse();
 		} catch (XmlPullParserException e) {
-			Log.e(TAG, "Exception parsing agency XML feed", e);
+			Log.e(TAG, "Exception parsing route XML feed", e);
 		} catch (IOException e) {
-			Log.e(TAG, "Exception loading agency XML feed", e);
+			Log.e(TAG, "Exception loading route XML feed", e);
 		}
 		
 		return data;
@@ -81,9 +78,9 @@ public class NextBus {
 			data = parser.parse();
 			
 		} catch (XmlPullParserException e) {
-			Log.e(TAG, "Exception parsing agency XML feed", e);
+			Log.e(TAG, "Exception parsing route config XML feed", e);
 		} catch (IOException e) {
-			Log.e(TAG, "Exception loading agency XML feed", e);
+			Log.e(TAG, "Exception loading route config XML feed", e);
 		}
 		
 		return data;
