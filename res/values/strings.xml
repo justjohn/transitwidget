@@ -29,5 +29,11 @@
         <item >Unspecified</item>
         <item >MBTA</item>
     </string-array>
+    <string name="directionLabel">Direction</string>
+    <string-array name="sample_directions">
+        <item >Unspecified</item>
+        <item >INBOUND</item>
+        <item >OUTBOUND</item>
+    </string-array>
 
 </resources>

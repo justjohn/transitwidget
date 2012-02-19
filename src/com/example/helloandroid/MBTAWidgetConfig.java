@@ -5,9 +5,11 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -15,6 +17,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import java.util.List;
+
+import com.example.helloandroid.adapters.BaseItemAdapter;
+import com.example.helloandroid.feed.model.Agency;
 
 /**
  * The configuration screen for the ExampleAppWidgetProvider widget sample.
@@ -31,12 +37,14 @@ public class MBTAWidgetConfig extends Activity {
     
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     
-    Spinner routeSpinner;
     Spinner agencySpinner;
+    Spinner routeSpinner;
+    Spinner directionSpinner;
     Spinner endPointSpinner;
     
     ArrayAdapter<CharSequence> routeAdapter;
-    ArrayAdapter<CharSequence> agencyAdapter;
+    BaseItemAdapter agencyAdapter;
+    ArrayAdapter<CharSequence> directionAdapter;
     ArrayAdapter<CharSequence> endPointAdapter;
     
     public MBTAWidgetConfig() {
@@ -77,9 +85,10 @@ public class MBTAWidgetConfig extends Activity {
         Log.i(TAG, "config agency spinner");
         agencySpinner = (Spinner) findViewById(R.id.agencySpinner);
         agencySpinner.setOnItemSelectedListener(AgencyItemSelectListener);
-        agencyAdapter = ArrayAdapter.createFromResource(this, R.array.default_agencies, android.R.layout.simple_spinner_item);
+        ArrayAdapter agencyAdapter = ArrayAdapter.createFromResource(this, R.array.default_agencies, android.R.layout.simple_spinner_item);
         agencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         agencySpinner.setAdapter(agencyAdapter);
+        new UpdateAgencies().execute();
         
         Log.i(TAG, "config route spinner");
         routeSpinner = (Spinner) findViewById(R.id.routeSpinner);
@@ -88,6 +97,12 @@ public class MBTAWidgetConfig extends Activity {
         routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         routeSpinner.setAdapter(routeAdapter);
      
+        directionSpinner = (Spinner) findViewById(R.id.directionSpinner);
+        directionSpinner.setOnItemSelectedListener(DirectionItemSelectListener);
+        directionAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
+        directionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        directionSpinner.setAdapter(directionAdapter);
+        
         endPointSpinner = (Spinner) findViewById(R.id.endPointSpinner);
         endPointAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
         endPointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -136,6 +151,17 @@ public class MBTAWidgetConfig extends Activity {
     ListView.OnItemSelectedListener RouteItemSelectListener = new OnItemSelectedListener() {
 		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 				long arg3) {
+			updateDirection();
+		}
+
+		public void onNothingSelected(AdapterView<?> arg0) {
+			updateDirection();
+		}
+    };
+    
+    ListView.OnItemSelectedListener DirectionItemSelectListener = new OnItemSelectedListener() {
+		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
+				long arg3) {
 			updateEndPoint();
 		}
 
@@ -165,6 +191,18 @@ public class MBTAWidgetConfig extends Activity {
         routeSpinner.setAdapter(routeAdapter);
     }
     
+    void updateDirection() {
+    	if(routeSpinner.getSelectedItemPosition() > 0) {
+    		directionAdapter = ArrayAdapter.createFromResource(this, R.array.sample_directions, android.R.layout.simple_spinner_item);
+    	} else {
+    		// No Route Selected
+    		directionAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
+    	}
+    	
+    	directionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        directionSpinner.setAdapter(directionAdapter);
+    }
+    
     void updateEndPoint() {
     	if(routeSpinner.getSelectedItemPosition() > 0) {
     		endPointAdapter = ArrayAdapter.createFromResource(this, R.array.sample_points, android.R.layout.simple_spinner_item);
@@ -175,6 +213,19 @@ public class MBTAWidgetConfig extends Activity {
     	
     	endPointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         endPointSpinner.setAdapter(endPointAdapter);
+    }
+    
+    private class UpdateAgencies extends AsyncTask<Void, Void, List<Agency>> {
+		@Override
+		protected List<Agency> doInBackground(Void... arg0) {
+			return NextBus.getAgencies();
+		}
+
+        protected void onPostExecute(List<Agency> result) {
+        	agencyAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
+        	agencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        	agencySpinner.setAdapter(agencyAdapter);
+        }
     }
     
     // Read the prefix from the SharedPreferences object for this widget.

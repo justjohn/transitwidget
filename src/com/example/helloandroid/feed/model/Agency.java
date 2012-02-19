@@ -1,17 +1,12 @@
 package com.example.helloandroid.feed.model;
 
-public class Agency {
-	private String tag;
+import com.example.helloandroid.adapters.BaseItem;
+
+public class Agency extends BaseItem {
 	private String title;
 	private String shortTitle;
 	private String regionTitle;
 	
-	public String getTag() {
-		return tag;
-	}
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
 	public String getTitle() {
 		return title;
 	}
@@ -33,6 +28,11 @@ public class Agency {
 	
 	@Override
 	public String toString() {
-		return "title: " + title + ", tag: " + tag + ", shortTitle: " + shortTitle + ", regionTitle: " + regionTitle;
+		return "title: " + title + ", tag: " + getTag() + ", shortTitle: " + shortTitle + ", regionTitle: " + regionTitle;
+	}
+	
+	@Override
+	public String getItemLabel() {
+		return getShortTitle();
 	}
 }

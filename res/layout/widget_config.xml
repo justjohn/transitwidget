@@ -56,12 +56,29 @@
             android:layout_alignLeft="@+id/agencySpinner"
             android:layout_below="@+id/routeLabel" />
 
+    	<TextView
+            android:id="@+id/directionLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/routeSpinner"
+            android:layout_marginTop="21dp"
+            android:text="@string/directionLabel"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        
+    	<Spinner
+            android:id="@+id/directionSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/routeSpinner"
+            android:layout_below="@+id/directionLabel" />
+    	
         <TextView
             android:id="@+id/endPointLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@+id/routeSpinner"
+            android:layout_below="@+id/directionSpinner"
             android:layout_marginTop="16dp"
             android:text="@string/endPointLabel"
             android:textAppearance="?android:attr/textAppearanceMedium" />
@@ -70,7 +87,7 @@
             android:id="@+id/endPointSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/routeSpinner"
+            android:layout_alignLeft="@+id/directionSpinner"
             android:layout_below="@+id/endPointLabel" />
 
 </RelativeLayout>
