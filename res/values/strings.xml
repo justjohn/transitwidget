@@ -1,5 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Click to kick off an data update!</string>
+
+    <string name="hello">Hello World, MBTAWidgetActivity!</string>
     <string name="app_name">Transit Widget</string>
+    <string name="default_text">hello</string>
+    <string name="saveBtnLabel">Save</string>
+    <string name="cancelBtnLabel">Cancel</string>
+    <string name="routeLabel">Select Route</string>
+    <string name="startPointLabel">Start</string>
+    <string name="endPointLabel">Stop</string>
+    <string-array name="default_routes">
+        <item >Unspecified</item>
+        <item >Route A</item>
+        <item >Route B</item>
+    </string-array>
+    <string-array name="default_points">
+        <item >Unspecified</item>
+    </string-array>
+    <string-array name="sample_points">
+        <item >Unspecified</item><item >Kendall</item>
+        <item >Harvard</item>
+        
+    </string-array>
+
 </resources>
