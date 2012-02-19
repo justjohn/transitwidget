@@ -177,7 +177,7 @@ public class NextBusObserverConfig {
 	}
 
 	public List<NextBusDirection> getDirections() {
-		if (directions == null && routes != null && agency != null) {
+		if (directions == null && route != null && agency != null) {
 			directions = new ArrayList<NextBusDirection>();
 			for (Direction model : NextBus.getRouteConfig(agency.getTag(), route.getTag())) {
 				directions.add(new NextBusDirection().init(model));
