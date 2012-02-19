@@ -59,8 +59,8 @@ public class NextBusObserverConfig {
 		this.direction = initValue(prefs, new NextBusDirection(),
 				PREF_DIRECTION);
 		this.stop = initValue(prefs, new NextBusStop(), PREF_STOP);
-		this.startObserving = prefs.getInt(PREF_START_OBSERVING, 0);
-		this.stopObserving = prefs.getInt(PREF_STOP_OBSERVING, 0);
+		this.startObserving = prefs.getInt(PREF_START_OBSERVING, -1);
+		this.stopObserving = prefs.getInt(PREF_STOP_OBSERVING, -1);
 	}
 
 	private <T extends NextBusValue> T initValue(SharedPreferences prefs, T v,
@@ -80,16 +80,26 @@ public class NextBusObserverConfig {
 		saveValue(prefs, this.route, PREF_ROUTE);
 		saveValue(prefs, this.direction, PREF_DIRECTION);
 		saveValue(prefs, this.stop, PREF_STOP);
-		prefs.putInt(PREF_START_OBSERVING, startObserving);
-		prefs.putInt(PREF_STOP_OBSERVING, stopObserving);
-
+		saveNonNegativeValue(prefs, this.startObserving, PREF_START_OBSERVING);
+		saveNonNegativeValue(prefs, this.stopObserving, PREF_STOP_OBSERVING);
 		prefs.commit();
+		return;
 	}
 
 	private static void saveValue(Editor prefs, NextBusValue value, String key) {
 		if (value != null) {
 			String s = value.toPrefsString();
 			prefs.putString(key, s);
+		} else {
+			prefs.remove(key);
+		}
+	}
+
+	private static void saveNonNegativeValue(Editor prefs, int value, String key) {
+		if (value >= 0) {
+			prefs.putInt(key, value);
+		} else {
+			prefs.remove(key);
 		}
 	}
 

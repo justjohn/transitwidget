@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.helloandroid.feed.model.Agency;
 import com.example.helloandroid.feed.model.Direction;
 import com.example.helloandroid.feed.model.Route;
+import com.example.helloandroid.prefs.NextBusObserverConfig;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -34,6 +35,12 @@ public class HelloAndroidActivity extends Activity {
         startAlarmButton.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
+
+				NextBusObserverConfig cfg = new NextBusObserverConfig(getApplicationContext(), 0);
+				cfg.save();
+				
+				
+				
 				long now = System.currentTimeMillis();
 				
 				intent.putExtra(MBTABackgroundService.EXTRA_END_TIME, now + 5 * 60 * 1000);

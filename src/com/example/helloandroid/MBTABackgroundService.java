@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.example.helloandroid.feed.model.BusPrediction;
+import com.example.helloandroid.prefs.NextBusObserverConfig;
 
 
 import android.app.AlarmManager;
@@ -46,6 +47,16 @@ public class MBTABackgroundService extends IntentService {
 		Log.i(TAG, "Service started");
 		
 	}
+	
+	
+	private void test() {
+		NextBusObserverConfig cfg = new NextBusObserverConfig(getApplicationContext(), 0);
+		cfg.save();
+		
+		
+	}
+	
+	
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
