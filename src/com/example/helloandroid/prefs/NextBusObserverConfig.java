@@ -87,8 +87,10 @@ public class NextBusObserverConfig {
 	}
 
 	private static void saveValue(Editor prefs, NextBusValue value, String key) {
-		String s = value.toPrefsString();
-		prefs.putString(key, s);
+		if (value != null) {
+			String s = value.toPrefsString();
+			prefs.putString(key, s);
+		}
 	}
 
 	private static boolean safeEquals(Object a, Object b) {
