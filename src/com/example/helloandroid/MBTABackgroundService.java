@@ -3,9 +3,11 @@
  */
 package com.example.helloandroid;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.example.helloandroid.feed.model.BusPrediction;
+
 
 import android.app.AlarmManager;
 import android.app.IntentService;

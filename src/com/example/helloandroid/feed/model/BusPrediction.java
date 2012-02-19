@@ -1,4 +1,4 @@
-package com.example.helloandroid;
+package com.example.helloandroid.feed.model;
 
 public class BusPrediction {
 	private String route;
