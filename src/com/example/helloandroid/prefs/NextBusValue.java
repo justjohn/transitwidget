@@ -72,6 +72,10 @@ public class NextBusValue extends BaseItem {
 	
 	@Override
 	public String getItemLabel() {
-		return getShortLabel();
+		if (getShortLabel() != null && !getShortLabel().isEmpty()) {
+			return getShortLabel();
+		} else {
+			return getLongLabel();
+		}
 	}
 }

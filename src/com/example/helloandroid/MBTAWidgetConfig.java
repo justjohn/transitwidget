@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import java.util.Calendar;
 import java.util.List;
 
 import com.example.helloandroid.adapters.BaseItemAdapter;
@@ -25,6 +26,7 @@ import com.example.helloandroid.prefs.NextBusDirection;
 import com.example.helloandroid.prefs.NextBusObserverConfig;
 import com.example.helloandroid.prefs.NextBusRoute;
 import com.example.helloandroid.prefs.NextBusStop;
+import com.example.helloandroid.service.AlarmSchedulerService;
 
 /**
  * The configuration screen for the ExampleAppWidgetProvider widget sample.
@@ -122,6 +124,15 @@ public class MBTAWidgetConfig extends Activity {
         public void onClick(View v) {
             final Context context = MBTAWidgetConfig.this;
 
+            // Until there are UI selectors, we'll start in 5 seconds and run for 10 minutes.
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.SECOND, 5); // start 5 seconds from now
+			int trigger_time = CalendarUtils.getTimeFromBeginingOfDay(cal);
+			int end_time = trigger_time + 600; // 10 minutes
+			
+			config.setStartObserving(trigger_time);
+			config.setStopObserving(end_time);
+			
             // When the button is clicked, save the string in our prefs and return that they
             // clicked OK.
             savePreferences(context, mAppWidgetId);
@@ -133,6 +144,12 @@ public class MBTAWidgetConfig extends Activity {
             Intent resultValue = new Intent();
             resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
             setResult(RESULT_OK, resultValue);
+
+			Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
+			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, mAppWidgetId);
+			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, trigger_time);
+			startService(serviceIntent);
+			
             finish();
         }
     };

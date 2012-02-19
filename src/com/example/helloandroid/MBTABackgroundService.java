@@ -53,15 +53,8 @@ public class MBTABackgroundService extends IntentService {
 		int widgetId = intent.getIntExtra(EXTRA_WIDGET_ID, 0);
 		
 		NextBusObserverConfig config = new NextBusObserverConfig(getApplicationContext(), widgetId);
-
-		Calendar cal = Calendar.getInstance();
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
 		
-		cal.add(Calendar.SECOND, config.getStopObserving());
-		
-		long endTime = cal.getTimeInMillis();
+		long endTime = CalendarUtils.getCalendarWithTimeFromMidnight(config.getStopObserving()).getTimeInMillis();
 		String agency = config.getAgency().getTag();
 		String routeTag = config.getRoute().getTag();
 		String stopTag = config.getStop().getTag();
@@ -90,33 +83,44 @@ public class MBTABackgroundService extends IntentService {
 			return;
 		}
 		
-		BusPrediction nextPrediction = predictions.get(0);
-		BusPrediction secondPrediction = predictions.get(1);
+		BusPrediction nextPrediction;
+		BusPrediction secondPrediction;
 		
-		int icon = android.R.drawable.ic_menu_compass;
-		CharSequence tickerText = predictions.toString();
-		long when = System.currentTimeMillis();
+		if (predictions.isEmpty()) {
+			Log.i(TAG, "No predictions available for selected route.");
 
-		Notification notification = new Notification(icon, tickerText, when);
+			nextPrediction = new BusPrediction();
+			secondPrediction = new BusPrediction();
+		} else {
 		
-		Context context = getApplicationContext();
-		Intent notificationIntent = new Intent("stupid-name");
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-
-		CharSequence contentTitle = "My notification";
-		CharSequence contentText = "Hello World!";
-		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-
-		nm.notify(0, notification);
-
-		Log.i(TAG, "Sent notification: " + tickerText);
+			nextPrediction = predictions.get(0);
+			secondPrediction = predictions.get(1);
+			
+			int icon = android.R.drawable.ic_menu_compass;
+			CharSequence tickerText = predictions.toString();
+			long when = System.currentTimeMillis();
+	
+			Notification notification = new Notification(icon, tickerText, when);
+			
+			Context context = getApplicationContext();
+			Intent notificationIntent = new Intent("stupid-name");
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+	
+			CharSequence contentTitle = "My notification";
+			CharSequence contentText = "Hello World!";
+			notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+	
+			nm.notify(0, notification);
+	
+			Log.i(TAG, "Sent notification: " + tickerText);
+		}
 		
 		// Update widget
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-		int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(getApplicationContext(), PredictionWidgetProvider.class));
+		// AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+		// int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(getApplicationContext(), PredictionWidgetProvider.class));
 		
 		// Un-comment when the preferences are finished
-		// int[] widgetIds = {widgetId};
+		int[] widgetIds = {widgetId};
 
 		Log.i(TAG, "Updating widgets: " + Arrays.asList(widgetIds));
 		
