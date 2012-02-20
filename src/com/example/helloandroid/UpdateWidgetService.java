@@ -69,14 +69,13 @@ public class UpdateWidgetService extends Service {
 			remoteViews.setTextViewText(R.id.update, route_info);
 			remoteViews.setTextViewText(R.id.next_time, next_time);
 
-			// Register an onClickListener
-			Intent clickIntent = new Intent(this.getApplicationContext(),
-					PredictionWidgetProvider.class);
+			// Register an onClickListener to refresh the widget
+			Intent clickIntent = new Intent(this.getApplicationContext(), MBTABackgroundService.class);
 
-			clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-			clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds);
+			clickIntent.setAction(MBTABackgroundService.ACTION_WAKEUP);
+			clickIntent.putExtra(MBTABackgroundService.EXTRA_WIDGET_ID, widgetId);
 
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(
+			PendingIntent pendingIntent = PendingIntent.getService(
 					getApplicationContext(), 0, clickIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
 			remoteViews.setOnClickPendingIntent(R.id.update, pendingIntent);

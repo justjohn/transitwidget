@@ -60,7 +60,6 @@ public class MBTABackgroundService extends IntentService {
 		String stopTag = config.getStop().getTag();
 		String directionTag = config.getDirection().getTag();
 		
-
 		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		nm.cancel(0);
 		
