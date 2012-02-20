@@ -87,7 +87,7 @@ public class MBTABackgroundService extends IntentService {
 
 		// Update the data, send notification
 		
-		List<BusPrediction> predictions = NextBus.getPredictions(agency, stopTag, directionTag, routeTag);
+		List<BusPrediction> predictions = NextBusAPI.getPredictions(agency, stopTag, directionTag, routeTag);
 		Log.i(TAG, "Got predictions: " + predictions);
 		if (predictions == null) {
 			Log.w(TAG, "Unable to load predictions");

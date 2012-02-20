@@ -22,8 +22,8 @@ import com.example.helloandroid.feed.model.Route;
 /**
  * Get results from the NextBus API.
  */
-public class NextBus {
-	private static final String TAG = NextBus.class.getName();
+public class NextBusAPI {
+	private static final String TAG = NextBusAPI.class.getName();
 
 	public static List<BusPrediction> getPredictions(String agency, String stopTag, String directionTag, String routeTag) {
 		List<BusPrediction> data = null;

@@ -6,14 +6,16 @@ package com.example.helloandroid.prefs;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.helloandroid.NextBus;
+import com.example.helloandroid.NextBusAPI;
 import com.example.helloandroid.feed.model.Agency;
 import com.example.helloandroid.feed.model.Direction;
 import com.example.helloandroid.feed.model.Route;
+import com.example.helloandroid.provider.contract.WidgetConfiguration;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 
 /**
  * @author james
@@ -52,25 +54,44 @@ public class NextBusObserverConfig {
 	public NextBusObserverConfig(Context ctx, int widgetId) {
 		this.ctx = ctx;
 		this.widgetId = widgetId;
+		
 		this.prefsName = PREFS_NAME_PREFIX + "_" + widgetId;
 		SharedPreferences prefs = ctx.getSharedPreferences(this.prefsName, 0);
+		
 		this.agency = initValue(prefs, new NextBusAgency(), PREF_AGENCY);
 		this.route = initValue(prefs, new NextBusRoute(), PREF_ROUTE);
-		this.direction = initValue(prefs, new NextBusDirection(),
-				PREF_DIRECTION);
+		this.direction = initValue(prefs, new NextBusDirection(), PREF_DIRECTION);
 		this.stop = initValue(prefs, new NextBusStop(), PREF_STOP);
 		this.startObserving = prefs.getInt(PREF_START_OBSERVING, -1);
 		this.stopObserving = prefs.getInt(PREF_STOP_OBSERVING, -1);
 		
-		if (this.startObserving == this.stopObserving &&
-				this.startObserving != -1) {
+		// Load from database
+        String selection = WidgetConfiguration.WIDGET_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(widgetId) };
+        Cursor cursor = ctx.getContentResolver().query(WidgetConfiguration.CONTENT_URI, null, selection, selectionArgs, null);
+        if (cursor.moveToFirst()) {
+        	String agencyTag = cursor.getString(cursor.getColumnIndex(WidgetConfiguration.AGENCY));
+        	String routeTag = cursor.getString(cursor.getColumnIndex(WidgetConfiguration.ROUTE));
+        	String directionTag = cursor.getString(cursor.getColumnIndex(WidgetConfiguration.DIRECTION));
+        	String stopTag = cursor.getString(cursor.getColumnIndex(WidgetConfiguration.STOP));
+
+        	this.startObserving = cursor.getInt(cursor.getColumnIndex(WidgetConfiguration.START_TIME));
+        	this.stopObserving = cursor.getInt(cursor.getColumnIndex(WidgetConfiguration.END_TIME));
+        } else {
+        	
+        	this.startObserving = -1;
+        	this.stopObserving = -1;
+        }
+        cursor.close();
+
+		if (this.startObserving == this.stopObserving && this.startObserving != -1) {
 			this.startObserving = this.stopObserving = -1;
 			modified = true;
 		}
+		
 	}
-
-	private <T extends NextBusValue> T initValue(SharedPreferences prefs, T v,
-			String key) {
+	
+	private <T extends NextBusValue> T initValue(SharedPreferences prefs, T v, String key) {
 		String s = prefs.getString(key, null);
 		if (s == null)
 			return null;
@@ -88,8 +109,10 @@ public class NextBusObserverConfig {
 		saveValue(prefs, this.stop, PREF_STOP);
 		saveNonNegativeValue(prefs, this.startObserving, PREF_START_OBSERVING);
 		saveNonNegativeValue(prefs, this.stopObserving, PREF_STOP_OBSERVING);
+		
 		prefs.commit();
-		return;
+		
+		// Persist to database
 	}
 
 	private static void saveValue(Editor prefs, NextBusValue value, String key) {
@@ -120,7 +143,7 @@ public class NextBusObserverConfig {
 	public List<NextBusAgency> getAgencies() {
 		if (agencies == null) {
 			agencies = new ArrayList<NextBusAgency>();
-			for (Agency model : NextBus.getAgencies()) {
+			for (Agency model : NextBusAPI.getAgencies()) {
 				agencies.add(new NextBusAgency().init(model));
 			}
 		}
@@ -149,7 +172,7 @@ public class NextBusObserverConfig {
 	public List<NextBusRoute> getRoutes() {
 		if (routes == null && agency != null) {
 			routes = new ArrayList<NextBusRoute>();
-			for (Route model : NextBus.getRoutes(agency.getTag())) {
+			for (Route model : NextBusAPI.getRoutes(agency.getTag())) {
 				routes.add(new NextBusRoute().init(model));
 			}
 		}
@@ -179,7 +202,7 @@ public class NextBusObserverConfig {
 	public List<NextBusDirection> getDirections() {
 		if (directions == null && route != null && agency != null) {
 			directions = new ArrayList<NextBusDirection>();
-			for (Direction model : NextBus.getRouteConfig(agency.getTag(), route.getTag())) {
+			for (Direction model : NextBusAPI.getRouteConfig(agency.getTag(), route.getTag())) {
 				directions.add(new NextBusDirection().init(model));
 			}
 		}
