@@ -12,13 +12,10 @@ import android.util.Log;
 // import android.widget.RemoteViews;
 
 public class PredictionWidgetProvider extends AppWidgetProvider {
-	
-//	private static final String ACTION_CLICK = "ACTION_CLICK";
 	private static final String LOG = PredictionWidgetProvider.class.getName();
 	
 	@Override
-	public void onUpdate(Context context, AppWidgetManager appWidgetManager,
-			int[] appWidgetIds) {
+	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
 		Log.w(LOG, "onUpdate method called");
 
@@ -32,6 +29,5 @@ public class PredictionWidgetProvider extends AppWidgetProvider {
 
 		// Update the widgets via the service
 		context.startService(intent);
-
 	}
 }

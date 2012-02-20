@@ -25,11 +25,11 @@ import com.example.helloandroid.feed.model.Route;
 public class NextBus {
 	private static final String TAG = NextBus.class.getName();
 
-	public static List<BusPrediction> getPredictions(String agency, String stopTag, String routeTag) {
+	public static List<BusPrediction> getPredictions(String agency, String stopTag, String directionTag, String routeTag) {
 		List<BusPrediction> data = null;
 		
 		try {
-			PredictionFeedParser parser = new PredictionFeedParser(agency, stopTag, routeTag);
+			PredictionFeedParser parser = new PredictionFeedParser(agency, stopTag, directionTag, routeTag);
 			data = parser.parse();
 		} catch (XmlPullParserException e) {
 			Log.e(TAG, "Exception parsing predictions XML feed", e);

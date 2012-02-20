@@ -1,6 +1,6 @@
 package com.example.helloandroid;
 
-import java.util.Random;
+import com.example.helloandroid.prefs.NextBusObserverConfig;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -15,56 +15,66 @@ public class UpdateWidgetService extends Service {
 	private static final String TAG = UpdateWidgetService.class.getName();
 	
 	public static final String EXTRA_NEXT_TIME = "EXTRA_NEXT_TIME";
-	public static final String EXTRA_NEXT_ROUTE = "EXTRA_NEXT_ROUTE";
-	public static final String EXTRA_NEXT_STOP = "EXTRA_NEXT_STOP";
-	public static final String EXTRA_NEXT_DIRECTION = "EXTRA_NEXT_DIRECTION";	
 	public static final String EXTRA_SECOND_TIME = "EXTRA_SECOND_TIME";
 
 	@Override
 	public void onStart(Intent intent, int startId) {
 		Log.i(TAG, "Called");
 
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this
-				.getApplicationContext());
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 
-		int[] allWidgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
+		int[] widgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
 
-		long now = System.currentTimeMillis();
+		for (int widgetId : widgetIds) {
 
-		String route = intent.getStringExtra(EXTRA_NEXT_ROUTE);
-		String stop = intent.getStringExtra(EXTRA_NEXT_STOP);
-		String direction = intent.getStringExtra(EXTRA_NEXT_DIRECTION);
-		long nextTimeMs = intent.getLongExtra(EXTRA_NEXT_TIME, now);
-		long seconds = (nextTimeMs - now) / 1000;
-		long minutes = seconds / 60;
-		seconds -= minutes * 60;
-
-		if (direction == null) direction = "";
-		if (stop == null) stop = "";
-		if (route == null) {
-			route = "No data.";
-		} else {
-			route += " -> " + direction;
-		}
-		
-		ComponentName thisWidget = new ComponentName(getApplicationContext(), PredictionWidgetProvider.class);
-		int[] allWidgetIds2 = appWidgetManager.getAppWidgetIds(thisWidget);
-		
-		Log.w(TAG, "From Intent" + String.valueOf(allWidgetIds.length));
-		Log.w(TAG, "Direct" + String.valueOf(allWidgetIds2.length));
-
-		for (int widgetId : allWidgetIds) {
+			String route_info;
+			String next_time;
+			
+			NextBusObserverConfig prefs = new NextBusObserverConfig(getApplicationContext(), widgetId);
+			if (prefs.getRoute() == null) {
+				// Not a known ID, display a error message.
+				next_time = "--";
+				route_info = "No data.\n";
+				
+			} else {
+			
+				long now = System.currentTimeMillis();
+	
+				String route = prefs.getRoute().getLongLabel();
+				String stop = prefs.getStop().getLongLabel();
+				String direction = prefs.getDirection().getShortLabel();
+				
+				long nextTimeMs = intent.getLongExtra(EXTRA_NEXT_TIME, -1);
+				if (nextTimeMs <= 0) {
+					// No prediction time
+					next_time = "--";
+					
+				} else {
+					long seconds = (nextTimeMs - now) / 1000;
+					long minutes = seconds / 60;
+					seconds -= minutes * 60;
+					next_time = minutes + "m " + seconds + "s";
+				}
+	
+				if (direction == null) direction = "";
+				if (stop == null) stop = "";
+				
+				route += " -> " + direction;
+				
+				route_info = route + "\n" + stop;
+			}
+			
 			RemoteViews remoteViews = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.widget_layout);
 			// Set the text
-			remoteViews.setTextViewText(R.id.update, route + "\n" + stop);
-			remoteViews.setTextViewText(R.id.next_time, minutes + "m " + seconds + "s");
+			remoteViews.setTextViewText(R.id.update, route_info);
+			remoteViews.setTextViewText(R.id.next_time, next_time);
 
 			// Register an onClickListener
 			Intent clickIntent = new Intent(this.getApplicationContext(),
 					PredictionWidgetProvider.class);
 
 			clickIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-			clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, allWidgetIds);
+			clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds);
 
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(
 					getApplicationContext(), 0, clickIntent,

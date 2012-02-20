@@ -58,13 +58,14 @@ public class MBTABackgroundService extends IntentService {
 		String agency = config.getAgency().getTag();
 		String routeTag = config.getRoute().getTag();
 		String stopTag = config.getStop().getTag();
+		String directionTag = config.getDirection().getTag();
 		
 
 		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		nm.cancel(0);
 		
-		Log.i(TAG, String.format("onHandleIntent: endTime=%d agency=%s routeTag=%s stopTag=%s",
-				endTime, agency, routeTag, stopTag));
+		Log.i(TAG, String.format("onHandleIntent: endTime=%d agency=%s directionTag=%s routeTag=%s stopTag=%s",
+				endTime, agency, directionTag, routeTag, stopTag));
 				
 		long now = System.currentTimeMillis();
 		if (now >= endTime) {
@@ -76,7 +77,7 @@ public class MBTABackgroundService extends IntentService {
 
 		// Update the data, send notification
 		
-		List<BusPrediction> predictions = NextBus.getPredictions(agency, stopTag, routeTag);
+		List<BusPrediction> predictions = NextBus.getPredictions(agency, stopTag, directionTag, routeTag);
 		Log.i(TAG, "Got predictions: " + predictions);
 		if (predictions == null) {
 			Log.w(TAG, "Unable to load predictions");
@@ -103,7 +104,7 @@ public class MBTABackgroundService extends IntentService {
 			Notification notification = new Notification(icon, tickerText, when);
 			
 			Context context = getApplicationContext();
-			Intent notificationIntent = new Intent("stupid-name");
+			Intent notificationIntent = new Intent("notification-action");
 			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 	
 			CharSequence contentTitle = "My notification";
@@ -115,11 +116,6 @@ public class MBTABackgroundService extends IntentService {
 			Log.i(TAG, "Sent notification: " + tickerText);
 		}
 		
-		// Update widget
-		// AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-		// int[] widgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(getApplicationContext(), PredictionWidgetProvider.class));
-		
-		// Un-comment when the preferences are finished
 		int[] widgetIds = {widgetId};
 
 		Log.i(TAG, "Updating widgets: " + Arrays.asList(widgetIds));
@@ -129,9 +125,6 @@ public class MBTABackgroundService extends IntentService {
 		updateWidgetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds);
 		
 		updateWidgetIntent.putExtra(UpdateWidgetService.EXTRA_NEXT_TIME, nextPrediction.getEpochTime());
-		updateWidgetIntent.putExtra(UpdateWidgetService.EXTRA_NEXT_DIRECTION, nextPrediction.getDirection());
-		updateWidgetIntent.putExtra(UpdateWidgetService.EXTRA_NEXT_ROUTE, nextPrediction.getRoute());
-		updateWidgetIntent.putExtra(UpdateWidgetService.EXTRA_NEXT_STOP, nextPrediction.getStopTitle());
 		updateWidgetIntent.putExtra(UpdateWidgetService.EXTRA_SECOND_TIME, secondPrediction.getEpochTime());
 
 		startService(updateWidgetIntent);

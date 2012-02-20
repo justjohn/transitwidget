@@ -2,7 +2,6 @@ package com.example.helloandroid.feed.model;
 
 public class BusPrediction {
 	private String route;
-	private String direction;
 	private String stopTitle;
 	
 	private long epochTime;
@@ -74,14 +73,6 @@ public class BusPrediction {
 
 	public void setDirTag(String dirTag) {
 		this.dirTag = dirTag;
-	}
-
-	public String getDirection() {
-		return direction;
-	}
-
-	public void setDirection(String direction) {
-		this.direction = direction;
 	}
 
 	public String getStopTitle() {

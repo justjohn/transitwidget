@@ -17,9 +17,9 @@ public class NextBusValue extends BaseItem {
 	public void init(String shortLabel, String longLabel, String tag) {
 		this.shortLabel = shortLabel;
 		this.longLabel = longLabel;
-		if (shortLabel == null || shortLabel.isEmpty()) {
+		if (shortLabel == null || shortLabel.equals("")) {
 			this.shortLabel = longLabel;
-		} else if (longLabel == null || longLabel.isEmpty()) {
+		} else if (longLabel == null || longLabel.equals("")) {
 			this.longLabel = shortLabel;
 		}
 		setTag(tag);
@@ -72,7 +72,7 @@ public class NextBusValue extends BaseItem {
 	
 	@Override
 	public String getItemLabel() {
-		if (getShortLabel() != null && !getShortLabel().isEmpty()) {
+		if (getShortLabel() != null && !getShortLabel().equals("")) {
 			return getShortLabel();
 		} else {
 			return getLongLabel();
