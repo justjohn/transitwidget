@@ -54,6 +54,17 @@ public class MBTABackgroundService extends IntentService {
 		
 		NextBusObserverConfig config = new NextBusObserverConfig(getApplicationContext(), widgetId);
 		
+		if (config.getAgency() == null) {
+			// This is an old widget without a configuration!
+			Log.w(TAG, "Unable to get widget preferences for widget " + widgetId);
+
+			// Remove any alarms for this widget
+			AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+			alarmManager.cancel(getPendingIntent(getApplicationContext(), intent, widgetId));
+			Log.i(TAG, "onHandleIntent: canceling alarm");
+			return;
+		}
+		
 		long endTime = CalendarUtils.getCalendarWithTimeFromMidnight(config.getStopObserving()).getTimeInMillis();
 		String agency = config.getAgency().getTag();
 		String routeTag = config.getRoute().getTag();
