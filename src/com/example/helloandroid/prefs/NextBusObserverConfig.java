@@ -6,38 +6,23 @@ package com.example.helloandroid.prefs;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.helloandroid.api.NextBusAPI;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+
 import com.example.helloandroid.api.ServiceProvider;
 import com.example.helloandroid.feed.model.Agency;
 import com.example.helloandroid.feed.model.Direction;
 import com.example.helloandroid.feed.model.Route;
 import com.example.helloandroid.provider.contract.WidgetConfiguration;
 
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.database.Cursor;
-
 /**
  * @author james
  * 
  */
 public class NextBusObserverConfig {
-	private static final String PREFS_NAME_PREFIX = NextBusObserverConfig.class
-			.getName();
-
-	private static final String PREF_AGENCY = "agency";
-	private static final String PREF_ROUTE = "route";
-	private static final String PREF_DIRECTION = "direction";
-	private static final String PREF_STOP = "stop";
-	private static final String PREF_START_OBSERVING = "start-observing";
-	private static final String PREF_STOP_OBSERVING = "stop-observing";
-
 	private final Context ctx;
 	private final int widgetId;
-	private final String prefsName;
 	private boolean modified = false;
 
 	private NextBusAgency agency;
@@ -57,16 +42,6 @@ public class NextBusObserverConfig {
 	public NextBusObserverConfig(Context ctx, int widgetId) {
 		this.ctx = ctx;
 		this.widgetId = widgetId;
-		
-		this.prefsName = PREFS_NAME_PREFIX + "_" + widgetId;
-		SharedPreferences prefs = ctx.getSharedPreferences(this.prefsName, 0);
-		
-//		this.agency = initValue(prefs, new NextBusAgency(), PREF_AGENCY);
-//		this.route = initValue(prefs, new NextBusRoute(), PREF_ROUTE);
-//		this.direction = initValue(prefs, new NextBusDirection(), PREF_DIRECTION);
-//		this.stop = initValue(prefs, new NextBusStop(), PREF_STOP);
-//		this.startObserving = prefs.getInt(PREF_START_OBSERVING, -1);
-//		this.stopObserving = prefs.getInt(PREF_STOP_OBSERVING, -1);
 		
 		// Load from database
         String selection = WidgetConfiguration.WIDGET_ID + " = ?";
@@ -99,31 +74,7 @@ public class NextBusObserverConfig {
 		
 	}
 
-	private <T extends NextBusValue> T initValue(String tag, T v, String key) {
-		v.loadFromTag(tag);
-		return v;
-	}
-	
-	private <T extends NextBusValue> T initValue(SharedPreferences prefs, T v, String key) {
-		String s = prefs.getString(key, null);
-		if (s == null)
-			return null;
-		v.initFromPrefs(s);
-		return v;
-	}
-
 	public void save() {
-//		SharedPreferences.Editor prefs = ctx.getSharedPreferences(
-//				this.prefsName, 0).edit();
-//
-//		saveValue(prefs, this.agency, PREF_AGENCY);
-//		saveValue(prefs, this.route, PREF_ROUTE);
-//		saveValue(prefs, this.direction, PREF_DIRECTION);
-//		saveValue(prefs, this.stop, PREF_STOP);
-//		saveNonNegativeValue(prefs, this.startObserving, PREF_START_OBSERVING);
-//		saveNonNegativeValue(prefs, this.stopObserving, PREF_STOP_OBSERVING);
-//		
-//		prefs.commit();
 		
 		// Persist to database
 		ContentValues values = new ContentValues();
@@ -145,23 +96,6 @@ public class NextBusObserverConfig {
 			ctx.getContentResolver().insert(WidgetConfiguration.CONTENT_URI, values);
 		}
 		cursor.close();
-	}
-
-	private static void saveValue(Editor prefs, NextBusValue value, String key) {
-		if (value != null) {
-			String s = value.toPrefsString();
-			prefs.putString(key, s);
-		} else {
-			prefs.remove(key);
-		}
-	}
-
-	private static void saveNonNegativeValue(Editor prefs, int value, String key) {
-		if (value >= 0) {
-			prefs.putInt(key, value);
-		} else {
-			prefs.remove(key);
-		}
 	}
 
 	private static boolean safeEquals(Object a, Object b) {

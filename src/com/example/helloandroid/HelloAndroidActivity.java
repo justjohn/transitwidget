@@ -13,6 +13,7 @@ import com.example.helloandroid.prefs.NextBusObserverConfig;
 import com.example.helloandroid.prefs.NextBusRoute;
 import com.example.helloandroid.prefs.NextBusStop;
 import com.example.helloandroid.service.AlarmSchedulerService;
+import com.example.helloandroid.service.MBTABackgroundService;
 
 import android.app.Activity;
 import android.app.AlarmManager;

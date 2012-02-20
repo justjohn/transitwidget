@@ -10,16 +10,8 @@ import com.example.helloandroid.adapters.BaseItem;
  *
  */
 abstract class NextBusValue extends BaseItem {
-	private final String SEP = "\001";
 	private String shortLabel;
 	private String longLabel;
-
-	abstract void initFromTag(String tag);
-	
-	public void loadFromTag(String tag) {
-		setTag(tag);
-		initFromTag(tag);
-	}
 	
 	public void init(String shortLabel, String longLabel, String tag) {
 		this.shortLabel = shortLabel;
@@ -31,15 +23,7 @@ abstract class NextBusValue extends BaseItem {
 		}
 		setTag(tag);
 	}
-	public void initFromPrefs(String prefsString) {
-		String[] parts = prefsString.split(SEP);
-		this.shortLabel = parts[0];
-		this.longLabel = parts[1];
-		setTag(parts[2]);
-	}
-	public String toPrefsString() {
-		return shortLabel + SEP + longLabel + SEP + getTag();
-	}
+	
 	public String getShortLabel() {
 		return shortLabel;
 	}

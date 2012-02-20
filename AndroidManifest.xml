@@ -50,9 +50,9 @@
         
 
         <!-- Service for handling data updates. -->
-        <service android:name=".MBTABackgroundService" />
+        <service android:name=".service.MBTABackgroundService" />
         <!-- Service for updating widget UIs. -->
-        <service android:name=".UpdateWidgetService" />
+        <service android:name=".service.UpdateWidgetService" />
         <!-- Service for scheduling alarms for when to start updating data. -->
         <service android:name=".service.AlarmSchedulerService" />
         
