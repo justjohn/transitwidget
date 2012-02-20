@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
      android:initialLayout="@layout/widget_layout"
-    android:minHeight="36dp"
+     android:minHeight="36dp"
      android:minWidth="292dp"
-     android:updatePeriodMillis="1800">
+     android:updatePeriodMillis="1800"
+     android:configure="com.example.helloandroid.MBTAWidgetConfig">
     
 
 </appwidget-provider>

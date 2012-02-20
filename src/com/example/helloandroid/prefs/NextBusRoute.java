@@ -7,4 +7,8 @@ public class NextBusRoute extends NextBusValue {
 		super.init(model.getTitle(), model.getTitle(), model.getTag());
 		return this;
 	}
+
+	public void initFromTag(String tag) {
+		
+	}
 }

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.example.helloandroid;
+package com.example.helloandroid.api;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,14 +22,18 @@ import com.example.helloandroid.feed.model.Route;
 /**
  * Get results from the NextBus API.
  */
-public class NextBus {
-	private static final String TAG = NextBus.class.getName();
+public class NextBusAPI implements ServiceAPI {
+	private static final String TAG = NextBusAPI.class.getName();
 
-	public static List<BusPrediction> getPredictions(String agency, String stopTag, String routeTag) {
+	public String getName() {
+		return "NextBusAPI";
+	}
+	
+	public List<BusPrediction> getPredictions(String agency, String stopTag, String directionTag, String routeTag) {
 		List<BusPrediction> data = null;
 		
 		try {
-			PredictionFeedParser parser = new PredictionFeedParser(agency, stopTag, routeTag);
+			PredictionFeedParser parser = new PredictionFeedParser(agency, stopTag, directionTag, routeTag);
 			data = parser.parse();
 		} catch (XmlPullParserException e) {
 			Log.e(TAG, "Exception parsing predictions XML feed", e);
@@ -40,7 +44,7 @@ public class NextBus {
 		return data;
 	}
 	
-	public static List<Agency> getAgencies() {
+	public List<Agency> getAgencies() {
 		List<Agency> data = null;
 		
 		try {
@@ -55,7 +59,7 @@ public class NextBus {
 		return data;
 	}
 	
-	public static List<Route> getRoutes(String agency) {
+	public List<Route> getRoutes(String agency) {
 		List<Route> data = null;
 		
 		try {
@@ -70,7 +74,7 @@ public class NextBus {
 		return data;
 	}
 
-	public static List<Direction> getRouteConfig(String agency, String route) {
+	public List<Direction> getRouteConfig(String agency, String route) {
 		List<Direction> data = null;
 		
 		try {

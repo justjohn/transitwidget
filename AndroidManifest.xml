@@ -4,7 +4,7 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="15" />
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="11" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -12,6 +12,14 @@
     <application
         android:icon="@drawable/eta_launcher_v2"
         android:label="@string/app_name" >
+        
+        <activity android:name=".MBTAWidgetConfig"
+            android:label="@string/app_name">
+    		<intent-filter>
+        		<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+    		</intent-filter>
+		</activity>
+		
         <activity
             android:name=".HelloAndroidActivity"
             android:label="@string/app_name" >
@@ -22,16 +30,14 @@
             </intent-filter>
         </activity>
 
-        <!-- Service for handling data updates. -->
-        <service android:name=".MBTABackgroundService" />
-
-        <!-- Receiver that will eventaully restore alarms after a reboot. -->
+        <!-- Receiver that will eventually restore alarms after a reboot. -->
         <receiver android:name=".WakeupReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         
+        <!-- Receiver that handles widget update events from the system. -->
         <receiver android:name=".PredictionWidgetProvider" >
             <intent-filter >
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -41,9 +47,26 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
         </receiver>
+        
+
+        <!-- Service for handling data updates. -->
+        <service android:name=".MBTABackgroundService" />
+        <!-- Service for updating widget UIs. -->
         <service android:name=".UpdateWidgetService" />
+        <!-- Service for scheduling alarms for when to start updating data. -->
         <service android:name=".service.AlarmSchedulerService" />
         
+        <!-- Provider for persisting widget configurations. -->
+        <provider android:name=".provider.WidgetConfigurationProvider"
+                  android:exported="false"
+                  android:enabled="true"
+                  android:authorities="transitwidget.provider.WidgetConfigurationProvider" />
+        
+        <!-- Provider for persisting transit service data. -->
+        <provider android:name=".provider.TransitServiceDataProvider"
+                  android:exported="false"
+                  android:enabled="true"
+                  android:authorities="transitwidget.provider.TransitServiceDataProvider" />
     </application>
 
 </manifest>

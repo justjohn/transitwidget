@@ -9,18 +9,31 @@
     <string name="routeLabel">Select Route</string>
     <string name="startPointLabel">Start</string>
     <string name="endPointLabel">Stop</string>
-    <string-array name="default_routes">
+    <string-array name="sample_routes">
         <item >Unspecified</item>
         <item >Route A</item>
         <item >Route B</item>
     </string-array>
-    <string-array name="default_points">
+    <string-array name="default_spinner">
         <item >Unspecified</item>
     </string-array>
     <string-array name="sample_points">
         <item >Unspecified</item><item >Kendall</item>
         <item >Harvard</item>
         
+    </string-array>
+    <string name="agencyLabel">Agency</string>
+    <string name="startTimeLabel">Start Time</string>
+    <string name="endTimeLabel">End Time</string>
+    <string-array name="default_agencies">
+        <item >Unspecified</item>
+        <item >MBTA</item>
+    </string-array>
+    <string name="directionLabel">Direction</string>
+    <string-array name="sample_directions">
+        <item >Unspecified</item>
+        <item >INBOUND</item>
+        <item >OUTBOUND</item>
     </string-array>
 
 </resources>

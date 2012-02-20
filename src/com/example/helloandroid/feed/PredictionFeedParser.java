@@ -33,9 +33,12 @@ public class PredictionFeedParser extends FeedParser {
 	private static final Object ATTR_STOP_TITLE = "stopTitle";
 
 	
-	public PredictionFeedParser(String agency, String stopTag, String routeTag) throws MalformedURLException {
+	private String directionTag;
+	
+	public PredictionFeedParser(String agency, String stopTag, String directionTag, String routeTag) throws MalformedURLException {
 		super(getPredictionUrl(agency, stopTag, routeTag));
 		Log.i(TAG, "Loading feed from URL: " + feedUrl);
+		this.directionTag = directionTag;
 	}
 
 	public List<BusPrediction> parse() throws XmlPullParserException, IOException {
@@ -73,7 +76,6 @@ public class PredictionFeedParser extends FeedParser {
 					Map<String, String> attributes = parseAttributes(xpp);
 
 					prediciton.setRoute(route);
-					prediciton.setDirection(direction);
 					prediciton.setStopTitle(stopTitle);
 
 					prediciton.setBlock(attributes.get(ATTR_BLOCK));
@@ -83,7 +85,10 @@ public class PredictionFeedParser extends FeedParser {
 					
 					prediciton.setEpochTime(Long.parseLong(attributes.get(ATTR_EPOCH_TIME)));
 					
-					predictions.add(prediciton);
+					// limit predictions to the selected direction
+					if (directionTag.equals(prediciton.getDirTag())) {
+						predictions.add(prediciton);
+					}
 				}
 				
 			}

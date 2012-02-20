@@ -7,4 +7,8 @@ public class NextBusAgency extends NextBusValue {
 		super.init(model.getShortTitle(), model.getTitle(), model.getTag());
 		return this;
 	}
+
+	public void initFromTag(String tag) {
+		
+	}
 }

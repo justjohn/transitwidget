@@ -3,34 +3,42 @@
  */
 package com.example.helloandroid.prefs;
 
+import com.example.helloandroid.adapters.BaseItem;
+
 /**
  * @author james
  *
  */
-public class NextBusValue {
+abstract class NextBusValue extends BaseItem {
 	private final String SEP = "\001";
 	private String shortLabel;
 	private String longLabel;
-	private String tag;
 
+	abstract void initFromTag(String tag);
+	
+	public void loadFromTag(String tag) {
+		setTag(tag);
+		initFromTag(tag);
+	}
+	
 	public void init(String shortLabel, String longLabel, String tag) {
 		this.shortLabel = shortLabel;
 		this.longLabel = longLabel;
-		if (shortLabel == null || shortLabel.isEmpty()) {
+		if (shortLabel == null || shortLabel.equals("")) {
 			this.shortLabel = longLabel;
-		} else if (longLabel == null || longLabel.isEmpty()) {
+		} else if (longLabel == null || longLabel.equals("")) {
 			this.longLabel = shortLabel;
 		}
-		this.tag = tag;
+		setTag(tag);
 	}
 	public void initFromPrefs(String prefsString) {
 		String[] parts = prefsString.split(SEP);
 		this.shortLabel = parts[0];
 		this.longLabel = parts[1];
-		this.tag = parts[2];
+		setTag(parts[2]);
 	}
 	public String toPrefsString() {
-		return shortLabel + SEP + longLabel + SEP + tag;
+		return shortLabel + SEP + longLabel + SEP + getTag();
 	}
 	public String getShortLabel() {
 		return shortLabel;
@@ -38,16 +46,14 @@ public class NextBusValue {
 	public String getLongLabel() {
 		return longLabel;
 	}
-	public String getTag() {
-		return tag;
-	}
 	@Override
 	public String toString() {
-		return tag;
+		return getTag();
 	}
 
 	@Override
 	public int hashCode() {
+		String tag = getTag();
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((tag == null) ? 0 : tag.hashCode());
@@ -55,6 +61,7 @@ public class NextBusValue {
 	}
 	@Override
 	public boolean equals(Object obj) {
+		String tag = getTag();
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -63,10 +70,19 @@ public class NextBusValue {
 			return false;
 		NextBusValue other = (NextBusValue) obj;
 		if (tag == null) {
-			if (other.tag != null)
+			if (other.getTag() != null)
 				return false;
-		} else if (!tag.equals(other.tag))
+		} else if (!tag.equals(other.getTag()))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String getItemLabel() {
+		if (getShortLabel() != null && !getShortLabel().equals("")) {
+			return getShortLabel();
+		} else {
+			return getLongLabel();
+		}
 	}
 }
