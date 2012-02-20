@@ -20,7 +20,11 @@ import android.widget.Spinner;
 import java.util.List;
 
 import com.example.helloandroid.adapters.BaseItemAdapter;
-import com.example.helloandroid.feed.model.Agency;
+import com.example.helloandroid.prefs.NextBusAgency;
+import com.example.helloandroid.prefs.NextBusDirection;
+import com.example.helloandroid.prefs.NextBusObserverConfig;
+import com.example.helloandroid.prefs.NextBusRoute;
+import com.example.helloandroid.prefs.NextBusStop;
 
 /**
  * The configuration screen for the ExampleAppWidgetProvider widget sample.
@@ -42,10 +46,11 @@ public class MBTAWidgetConfig extends Activity {
     Spinner directionSpinner;
     Spinner endPointSpinner;
     
-    ArrayAdapter<CharSequence> routeAdapter;
-    BaseItemAdapter agencyAdapter;
+    BaseItemAdapter<NextBusRoute> routeAdapter;
+    BaseItemAdapter<NextBusAgency> agencyAdapter;
     ArrayAdapter<CharSequence> directionAdapter;
     ArrayAdapter<CharSequence> endPointAdapter;
+    NextBusObserverConfig config;
     
     public MBTAWidgetConfig() {
         super();
@@ -81,19 +86,18 @@ public class MBTAWidgetConfig extends Activity {
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             //finish();
         }
-
+        
         Log.i(TAG, "config agency spinner");
         agencySpinner = (Spinner) findViewById(R.id.agencySpinner);
         agencySpinner.setOnItemSelectedListener(AgencyItemSelectListener);
-        ArrayAdapter agencyAdapter = ArrayAdapter.createFromResource(this, R.array.default_agencies, android.R.layout.simple_spinner_item);
+        ArrayAdapter agencyAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
         agencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         agencySpinner.setAdapter(agencyAdapter);
-        new UpdateAgencies().execute();
         
         Log.i(TAG, "config route spinner");
         routeSpinner = (Spinner) findViewById(R.id.routeSpinner);
         routeSpinner.setOnItemSelectedListener(RouteItemSelectListener);
-        routeAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
+        ArrayAdapter routeAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
         routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         routeSpinner.setAdapter(routeAdapter);
      
@@ -108,7 +112,9 @@ public class MBTAWidgetConfig extends Activity {
         endPointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         endPointSpinner.setAdapter(routeAdapter);
         
-        loadPreferences(MBTAWidgetConfig.this, mAppWidgetId);
+        config = new NextBusObserverConfig(MBTAWidgetConfig.this, mAppWidgetId);
+        new UpdateAgencies().execute(config);
+
         Log.i(TAG, "End OnCreate");
     }
 
@@ -177,23 +183,32 @@ public class MBTAWidgetConfig extends Activity {
         prefs.putString(PREF_START + appWidgetId, routeSpinner.getSelectedItem().toString());
         prefs.putString(PREF_END + appWidgetId, routeSpinner.getSelectedItem().toString());
         prefs.commit();
+        
+        int pos;
+        pos = endPointSpinner.getSelectedItemPosition();
+        config.setStop((NextBusStop) endPointAdapter.getItem(pos));
+        config.save();
+        Log.i(TAG, config.getStops().toString());
     }
 
     void updateRoute() {
     	if(agencySpinner.getSelectedItemPosition() > 0) {
-    		routeAdapter = ArrayAdapter.createFromResource(this, R.array.sample_routes, android.R.layout.simple_spinner_item);
+    		int pos = agencySpinner.getSelectedItemPosition();
+            config.setAgency((NextBusAgency) agencyAdapter.getItem(pos));
+    		new UpdateRoutes().execute(config);
     	} else {
     		// No Route Selected
-    		routeAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
+    		ArrayAdapter routeAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
+    		routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            routeSpinner.setAdapter(routeAdapter);
     	}
-    	
-        routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        routeSpinner.setAdapter(routeAdapter);
     }
     
     void updateDirection() {
     	if(routeSpinner.getSelectedItemPosition() > 0) {
-    		directionAdapter = ArrayAdapter.createFromResource(this, R.array.sample_directions, android.R.layout.simple_spinner_item);
+    		int pos = routeSpinner.getSelectedItemPosition();
+            config.setRoute((NextBusRoute) routeAdapter.getItem(pos));
+    		new UpdateDirection().execute(config);
     	} else {
     		// No Route Selected
     		directionAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
@@ -204,8 +219,10 @@ public class MBTAWidgetConfig extends Activity {
     }
     
     void updateEndPoint() {
-    	if(routeSpinner.getSelectedItemPosition() > 0) {
-    		endPointAdapter = ArrayAdapter.createFromResource(this, R.array.sample_points, android.R.layout.simple_spinner_item);
+    	if(directionSpinner.getSelectedItemPosition() > 0) {
+    		int pos = directionSpinner.getSelectedItemPosition();
+            config.setRoute((NextBusRoute) directionAdapter.getItem(pos));
+    		new UpdateEndPoint().execute(config);
     	} else {
     		// No Route Selected
     		endPointAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
@@ -215,32 +232,55 @@ public class MBTAWidgetConfig extends Activity {
         endPointSpinner.setAdapter(endPointAdapter);
     }
     
-    private class UpdateAgencies extends AsyncTask<Void, Void, List<Agency>> {
+    private class UpdateAgencies extends AsyncTask<NextBusObserverConfig, Void, List<NextBusAgency>> {
 		@Override
-		protected List<Agency> doInBackground(Void... arg0) {
-			return NextBus.getAgencies();
+		protected List<NextBusAgency> doInBackground(NextBusObserverConfig... arg) {
+			return arg[0].getAgencies();
 		}
 
-        protected void onPostExecute(List<Agency> result) {
+        protected void onPostExecute(List<NextBusAgency> result) {
         	agencyAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
         	agencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         	agencySpinner.setAdapter(agencyAdapter);
         }
     }
     
-    // Read the prefix from the SharedPreferences object for this widget.
-    // If there is no preference saved, get the default from a resource
-    void loadPreferences(Context context, int appWidgetId) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
-        int pos;
-        String route = prefs.getString(PREF_ROUTE + appWidgetId, null);
-        pos = routeAdapter.getPosition(route);
-        if(pos > 0) {
-        	routeSpinner.setSelection(pos);
-        } else {
-        	routeSpinner.setSelection(0);
-        }
-        updateRoute();
+    private class UpdateRoutes extends AsyncTask<NextBusObserverConfig, Void, List<NextBusRoute>> {
+		@Override
+		protected List<NextBusRoute> doInBackground(NextBusObserverConfig... arg) {
+			return arg[0].getRoutes();
+		}
 
+        protected void onPostExecute(List<NextBusRoute> result) {
+        	routeAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
+        	routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        	routeSpinner.setAdapter(routeAdapter);
+        }
+    }
+    
+    private class UpdateDirection extends AsyncTask<NextBusObserverConfig, Void, List<NextBusRoute>> {
+		@Override
+		protected List<NextBusRoute> doInBackground(NextBusObserverConfig... arg) {
+			return arg[0].getRoutes();
+		}
+
+        protected void onPostExecute(List<NextBusRoute> result) {
+        	routeAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
+        	routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        	routeSpinner.setAdapter(routeAdapter);
+        }
+    }
+    
+    private class UpdateEndPoint extends AsyncTask<NextBusObserverConfig, Void, List<NextBusRoute>> {
+		@Override
+		protected List<NextBusRoute> doInBackground(NextBusObserverConfig... arg) {
+			return arg[0].getRoutes();
+		}
+
+        protected void onPostExecute(List<NextBusRoute> result) {
+        	routeAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
+        	routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        	routeSpinner.setAdapter(routeAdapter);
+        }
     }
 }
