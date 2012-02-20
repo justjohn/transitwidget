@@ -107,6 +107,9 @@ public class WidgetConfigurationProvider extends ContentProvider {
         }
         
         long id = database.insert(table, null, values);
+        
+        Log.i(TAG, "DB: " + id + " -> " + values);
+        
         return Uri.withAppendedPath(baseUri, String.valueOf(id));
     }
 
@@ -145,6 +148,8 @@ public class WidgetConfigurationProvider extends ContentProvider {
         }
         
         int count = database.update(table, values, selection, selectionArgs);
+
+        Log.i(TAG, "DB: c." + count + " -> " + values);
         
         getContext().getContentResolver().notifyChange(uri, null);
         return count;
@@ -169,6 +174,7 @@ public class WidgetConfigurationProvider extends ContentProvider {
 					   + WidgetConfiguration.AGENCY + " TEXT, "
 					   + WidgetConfiguration.DIRECTION + " TEXT, "
 					   + WidgetConfiguration.STOP + " TEXT, "
+					   + WidgetConfiguration.ROUTE + " TEXT, "
 					   + WidgetConfiguration.START_TIME + " INTEGER, "
 					   + WidgetConfiguration.END_TIME + " INTEGER, "
 					   + WidgetConfiguration.DAYS + " TEXT"

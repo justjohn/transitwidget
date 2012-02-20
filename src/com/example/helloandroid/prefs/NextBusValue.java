@@ -9,11 +9,18 @@ import com.example.helloandroid.adapters.BaseItem;
  * @author james
  *
  */
-public class NextBusValue extends BaseItem {
+abstract class NextBusValue extends BaseItem {
 	private final String SEP = "\001";
 	private String shortLabel;
 	private String longLabel;
 
+	abstract void initFromTag(String tag);
+	
+	public void loadFromTag(String tag) {
+		setTag(tag);
+		initFromTag(tag);
+	}
+	
 	public void init(String shortLabel, String longLabel, String tag) {
 		this.shortLabel = shortLabel;
 		this.longLabel = longLabel;

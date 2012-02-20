@@ -99,6 +99,15 @@ public class TransitServiceDataProvider extends ContentProvider {
 	            qBuilder.appendWhere(Direction._ID + " = " + uri.getLastPathSegment());
 	            
 	            break;
+	        case STOPS:
+	            qBuilder.setTables(Stop.TABLE_NAME);
+	            
+	            break;
+	        case STOP_ID:
+	            qBuilder.setTables(Stop.TABLE_NAME);
+	            qBuilder.appendWhere(Stop._ID + " = " + uri.getLastPathSegment());
+	            
+	            break;
             default:
                 throw new IllegalArgumentException("URI " + uri + " not recognized by widget configuration content provider.");
         }
@@ -177,6 +186,9 @@ public class TransitServiceDataProvider extends ContentProvider {
         }
         
         long id = database.insert(table, null, values);
+
+    	// Log.d(TAG, "DB: " + id + " -> " + values);
+    	
         return Uri.withAppendedPath(baseUri, String.valueOf(id));
     }
 
@@ -257,44 +269,10 @@ public class TransitServiceDataProvider extends ContentProvider {
 	     */
 	    @Override
 	    public void onCreate(SQLiteDatabase db) {
-			String sql = "CREATE TABLE " + Agency.TABLE_NAME + " ( " 
-					   + Agency._ID + " INTEGER PRIMARY KEY, "
-					   + Agency.TITLE + " TEXT, "
-					   + Agency.SHORT_TITLE + " TEXT, "
-					   + Agency.REGION_TITLE + " TEXT"
-				   + " );";
-
-			Log.w(TAG, "Creating service data table with sql " + sql);
-			db.execSQL(sql);
-
-			sql = "CREATE TABLE " + Route.TABLE_NAME + " ( " 
-					   + Route._ID + " INTEGER PRIMARY KEY, "
-					   + Route.TAG + " TEXT, "
-					   + Route.TITLE + " TEXT"
-				   + " );";
-
-			Log.w(TAG, "Creating service data table with sql " + sql);
-			db.execSQL(sql);
-
-			sql = "CREATE TABLE " + Direction.TABLE_NAME + " ( " 
-					   + Direction._ID + " INTEGER PRIMARY KEY, "
-					   + Direction.TAG + " TEXT, "
-					   + Direction.NAME + " TEXT, "
-					   + Direction.TITLE + " TEXT, "
-					   + Direction.STOPS + " TEXT"
-				   + " );";
-
-			Log.w(TAG, "Creating service data table with sql " + sql);
-			db.execSQL(sql);
-			
-			sql = "CREATE TABLE " + Stop.TABLE_NAME + " ( " 
-					   + Stop._ID + " INTEGER PRIMARY KEY, "
-					   + Stop.TAG + " TEXT, "
-					   + Stop.TITLE + " TEXT"
-				   + " );";
-
-			Log.w(TAG, "Creating service data table with sql " + sql);
-			db.execSQL(sql);
+	    	Agency.onCreate(db);
+	    	Route.onCreate(db);
+	    	Direction.onCreate(db);
+	    	Stop.onCreate(db);
 	    }
 	
 	    /**
@@ -305,7 +283,10 @@ public class TransitServiceDataProvider extends ContentProvider {
 			// Logs that the database is being upgraded
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion);
 			
-			// Nothing to do here (yet)
+			Agency.onUpgrade(db, oldVersion, newVersion);
+			Route.onUpgrade(db, oldVersion, newVersion);
+			Direction.onUpgrade(db, oldVersion, newVersion);
+			Stop.onUpgrade(db, oldVersion, newVersion);
 	    }
 	}
 }

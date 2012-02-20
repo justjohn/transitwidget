@@ -7,8 +7,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import com.example.helloandroid.api.NextBusAPI;
 import com.example.helloandroid.feed.model.BusPrediction;
 import com.example.helloandroid.prefs.NextBusObserverConfig;
+import com.example.helloandroid.utils.CalendarUtils;
 
 
 import android.app.AlarmManager;
@@ -75,7 +77,7 @@ public class MBTABackgroundService extends IntentService {
 		nm.cancel(0);
 		
 		Log.i(TAG, String.format("onHandleIntent: endTime=%d agency=%s directionTag=%s routeTag=%s stopTag=%s",
-				endTime, agency, directionTag, routeTag, stopTag));
+				config.getStopObserving(), agency, directionTag, routeTag, stopTag));
 				
 		long now = System.currentTimeMillis();
 		if (now >= endTime) {
@@ -87,7 +89,7 @@ public class MBTABackgroundService extends IntentService {
 
 		// Update the data, send notification
 		
-		List<BusPrediction> predictions = NextBusAPI.getPredictions(agency, stopTag, directionTag, routeTag);
+		List<BusPrediction> predictions = new NextBusAPI().getPredictions(agency, stopTag, directionTag, routeTag);
 		Log.i(TAG, "Got predictions: " + predictions);
 		if (predictions == null) {
 			Log.w(TAG, "Unable to load predictions");

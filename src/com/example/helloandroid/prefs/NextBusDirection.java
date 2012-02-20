@@ -23,4 +23,8 @@ public class NextBusDirection extends NextBusValue {
 	public List<NextBusStop> getStops() {
 		return stops;
 	}
+
+	public void initFromTag(String tag) {
+		
+	}
 }

@@ -38,25 +38,25 @@ public class HelloAndroidActivity extends Activity {
         final AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         
         final Intent intent = MBTABackgroundService.createPredictionIntent( getApplicationContext(), 0);
-//        
+        
 //        new AsyncTask<Integer, String, String>() {
 //        	@Override
 //        	protected String doInBackground(Integer... params) {
 //
 //		        NextBusObserverConfig config = new NextBusObserverConfig(getApplicationContext(), params[0]);
-//		        config.getAgencies();
+//		        Log.i(TAG, config.getAgencies().toString());
 //
 //		        NextBusAgency agency = new NextBusAgency();
-//		        agency.init("mbta", "mbta", "mbta");
+//		        agency.init("MBTA", "MBTA", "mbta");
 //		        config.setAgency(agency);
 //		        
-//		        config.getRoutes();
+//		        Log.i(TAG, config.getRoutes().toString());
 //
 //		        NextBusRoute route = new NextBusRoute();
 //		        route.init("77", "77", "77");
 //		        config.setRoute(route);
 //		        
-//		        config.getDirections();
+//		        Log.i(TAG, config.getDirections().toString());
 //		        
 //		        NextBusDirection direction = new NextBusDirection();
 //		        direction.init("Arlington Heights via Mass. Ave.", "Arlington Heights via Mass. Ave.", "77_0_var0");

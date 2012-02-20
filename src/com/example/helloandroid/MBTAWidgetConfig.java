@@ -27,6 +27,7 @@ import com.example.helloandroid.prefs.NextBusObserverConfig;
 import com.example.helloandroid.prefs.NextBusRoute;
 import com.example.helloandroid.prefs.NextBusStop;
 import com.example.helloandroid.service.AlarmSchedulerService;
+import com.example.helloandroid.utils.CalendarUtils;
 
 /**
  * The configuration screen for the ExampleAppWidgetProvider widget sample.

@@ -1,4 +1,4 @@
-package com.example.helloandroid;
+package com.example.helloandroid.utils;
 
 import java.util.Calendar;
 
@@ -20,7 +20,7 @@ public class CalendarUtils {
     	int minute = cal.get(Calendar.MINUTE);
     	int seconds = cal.get(Calendar.SECOND);
     	
-    	return seconds + minute * 60 + hours * 60 * 60;
+    	return seconds + (minute + hours * 60) * 60;
     }
 
 }
