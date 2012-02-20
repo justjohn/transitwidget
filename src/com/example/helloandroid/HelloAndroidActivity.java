@@ -7,6 +7,7 @@ import java.util.Locale;
 import com.example.helloandroid.feed.model.Agency;
 import com.example.helloandroid.feed.model.Direction;
 import com.example.helloandroid.feed.model.Route;
+import com.example.helloandroid.feed.model.Stop;
 import com.example.helloandroid.prefs.NextBusAgency;
 import com.example.helloandroid.prefs.NextBusDirection;
 import com.example.helloandroid.prefs.NextBusObserverConfig;
@@ -18,13 +19,19 @@ import com.example.helloandroid.service.MBTABackgroundService;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CursorAdapter;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 public class HelloAndroidActivity extends Activity {
     private static final String TAG = HelloAndroidActivity.class.getName();
@@ -70,7 +77,13 @@ public class HelloAndroidActivity extends Activity {
 //        }.execute(0);
         
         
+        ListView list = (ListView)findViewById(R.id.listView);
+        String[] from = {Route.TAG, Route.TITLE};
+        int[] to = {R.id.val1, R.id.val2};
         
+        Cursor cursor = getContentResolver().query(Route.CONTENT_URI, null, null, null, null);
+        startManagingCursor(cursor);
+        list.setAdapter(new SimpleCursorAdapter(getApplicationContext(), R.layout.list_item, cursor, from, to));
         
         startAlarmButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {

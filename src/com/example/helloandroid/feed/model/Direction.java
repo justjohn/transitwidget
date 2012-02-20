@@ -1,7 +1,9 @@
 package com.example.helloandroid.feed.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,6 +17,8 @@ import com.example.helloandroid.provider.TransitServiceDataProvider;
 import com.example.helloandroid.utils.StringUtils;
 
 public class Direction {
+	public static final String LOGTAG = Direction.class.getName();
+	
 	public static final String TABLE_NAME = "directions";
 	
     public static final String CONTENT_TYPE = "vnd.android.cursor.dir/transitwidget.service.direction";
@@ -47,14 +51,33 @@ public class Direction {
 		fillStops(stopTags, context);
 	}
 	
+	/**
+	 * Add the stops in the right order from the database to this direction.
+	 * 
+	 * @param stopTags
+	 * @param context
+	 */
 	private void fillStops(String[] stopTags, Context context) {
+		// Get the stop from the database
 		String selection = Stop.AGENCY + " = ? AND " + Stop.TAG + " IN (" + StringUtils.join(stopTags, ",", "\"") + ")";
+		Log.i(TAG, "Loadind stops: " + selection);
 		String[] selectionArgs = { agency };
 		Cursor cursor = context.getContentResolver().query(Stop.CONTENT_URI, null, selection, selectionArgs, null);
+		
+		// Get a handle on the elements form the database. 
+		// 		Because stops can be shared between routes/directions the order
+		// 		in the database isn't the same as this route segment.
+		Map<String, Stop> stopMap = new HashMap<String, Stop>();
 		while(cursor.moveToNext()) {
-			addStop(new Stop(cursor));
+			Stop stop = new Stop(cursor);
+			stopMap.put(stop.getTag(), stop);
 		}
 		cursor.close();
+		
+		// Add the stops in the right order
+		for (String stopTag : stopTags) {
+			addStop(stopMap.get(stopTag));
+		}
 	}
 
 	public ContentValues getContentValues() {
@@ -146,7 +169,7 @@ public class Direction {
 				   + STOPS + " TEXT"
 			   + " );";
 
-		Log.w(TAG, "Creating service data direction table with sql " + sql);
+		Log.w(LOGTAG, "Creating service data direction table with sql " + sql);
 		db.execSQL(sql);
     }
 

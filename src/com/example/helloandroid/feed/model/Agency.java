@@ -1,7 +1,5 @@
 package com.example.helloandroid.feed.model;
 
-import java.util.Arrays;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,6 +11,8 @@ import com.example.helloandroid.adapters.BaseItem;
 import com.example.helloandroid.provider.TransitServiceDataProvider;
 
 public class Agency extends BaseItem {
+	public static final String LOGTAG = Agency.class.getName();
+	
 	public static final String TABLE_NAME = "agencies";
 
     public static final String CONTENT_TYPE = "vnd.android.cursor.dir/transitwidget.service.agendy";
@@ -115,7 +115,7 @@ public class Agency extends BaseItem {
 				   + REGION_TITLE + " TEXT"
 			   + " );";
 
-		Log.w(TAG, "Creating service data agency table with sql " + sql);
+		Log.w(LOGTAG, "Creating service data agency table with sql " + sql);
 		db.execSQL(sql);
     }
 

@@ -14,6 +14,8 @@ abstract class FeedParser {
 
 	public static final String ATTR_TAG = "tag";
 	public static final String ATTR_TITLE = "title";
+	public static final String ATTR_LAT = "lat";
+	public static final String ATTR_LON = "lon";
 	
     final URL feedUrl;
 

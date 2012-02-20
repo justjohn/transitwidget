@@ -24,8 +24,9 @@ public class RouteConfigFeedParser extends FeedParser {
 	// XML tag and attributes
 	private static final String STOP = "stop";
 	private static final String DIRECTION = "direction";
-	
+
 	private static final String ATTR_NAME = "name";
+	private static final String ATTR_STOP_ID = "stopId";
 	
 	public RouteConfigFeedParser(String agency, String route) throws MalformedURLException {
 		super(getCommandUrl("routeConfig", agency, route));
@@ -71,6 +72,9 @@ public class RouteConfigFeedParser extends FeedParser {
 						
 						stop.setTag(attributes.get(ATTR_TAG));
 						stop.setTitle(attributes.get(ATTR_TITLE));
+						if (attributes.get(ATTR_STOP_ID) != null) {
+							stop.setStopId(Integer.parseInt(attributes.get(ATTR_STOP_ID)));
+						}
 						
 						stops.put(stop.getTag(), stop);
 					} else {
