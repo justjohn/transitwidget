@@ -155,8 +155,7 @@ public class NextBusObserverConfig {
 		}
 		modified = true;
 		this.route = route;
-		direction = null;
-		stop = null;
+		clearDirection();
 	}
 
 	private void clearDirection() {
@@ -185,7 +184,7 @@ public class NextBusObserverConfig {
 		}
 		modified = true;
 		this.direction = direction;
-		stop = null;
+		clearStop();
 	}
 
 	private void clearStop() {
