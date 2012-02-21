@@ -3,12 +3,14 @@ package com.example.helloandroid.receiver;
 import com.example.helloandroid.PredictionWidgetProvider;
 import com.example.helloandroid.prefs.NextBusObserverConfig;
 import com.example.helloandroid.service.AlarmSchedulerService;
+import com.example.helloandroid.utils.CalendarUtils;
 
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 public class WakeupReceiver extends BroadcastReceiver {
@@ -24,6 +26,7 @@ public class WakeupReceiver extends BroadcastReceiver {
 		
 		for (int widgetId : widgetIds) {
 			NextBusObserverConfig config = new NextBusObserverConfig(ctx, widgetId);
+			Log.i(TAG, "Reset alarm for widget " + widgetId + " to " + DateFormat.format("h:mmaa", CalendarUtils.getCalendarWithTimeFromMidnight(config.getStartObserving())));
 
 			Intent serviceIntent = new Intent(ctx, AlarmSchedulerService.class);
 			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, widgetId);
