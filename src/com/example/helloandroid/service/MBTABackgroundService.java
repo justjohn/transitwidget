@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.example.helloandroid;
+package com.example.helloandroid.service;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -19,23 +19,22 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 /**
- * @author james
- *
+ * Handles reading prediction data from feeds and triggering widget updates.
  */
 public class MBTABackgroundService extends IntentService {
-	public static final String ACTION_WAKEUP = "mbta-wakeup";
-	
-	
 	private static final String TAG = MBTABackgroundService.class.getName();
-
-
-	public static final String EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID";
+	
+	public static final String ACTION_WAKEUP = "ACTION_WAKEUP";
+	public static final String ACTION_WAKEUP_IMMEDIATE = "ACTION_WAKEUP_IMMEDIATE";
+	
+	public static final String EXTRA_WIDGET_ID = "EXTRA_WIDGET_ID";	
+	public static final String EXTRA_IMMEDIATE = "EXTRA_IMMEDIATE";
 	
 	public MBTABackgroundService() {
 		super("MBTABackgroundService");
@@ -50,9 +49,16 @@ public class MBTABackgroundService extends IntentService {
 	
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.i(TAG, "onHandleIntent " + intent.getAction());
+		String action = intent.getAction();
+		Log.i(TAG, "onHandleIntent " + action);
 		
 		int widgetId = intent.getIntExtra(EXTRA_WIDGET_ID, 0);
+		if (widgetId == 0) {
+			Log.e(TAG, "Got an invalid or no widgetID in BackgroundService");
+			return;
+		}
+		
+		boolean immediate = intent.getBooleanExtra(EXTRA_IMMEDIATE, false);
 		
 		NextBusObserverConfig config = new NextBusObserverConfig(getApplicationContext(), widgetId);
 		
@@ -66,8 +72,9 @@ public class MBTABackgroundService extends IntentService {
 			Log.i(TAG, "onHandleIntent: canceling alarm");
 			return;
 		}
-		
-		long endTime = CalendarUtils.getCalendarWithTimeFromMidnight(config.getStopObserving()).getTimeInMillis();
+
+		Calendar endTime = CalendarUtils.getCalendarWithTimeFromMidnight(config.getStopObserving());
+		// Calendar startTime = CalendarUtils.getCalendarWithTimeFromMidnight(config.getStartObserving());
 		String agency = config.getAgency().getTag();
 		String routeTag = config.getRoute().getTag();
 		String stopTag = config.getStop().getTag();
@@ -76,14 +83,22 @@ public class MBTABackgroundService extends IntentService {
 		NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		nm.cancel(0);
 		
-		Log.i(TAG, String.format("onHandleIntent: endTime=%d agency=%s directionTag=%s routeTag=%s stopTag=%s",
-				config.getStopObserving(), agency, directionTag, routeTag, stopTag));
+		Log.i(TAG, String.format("onHandleIntent: widgetId=%d endTime=%s agency=%s directionTag=%s routeTag=%s stopTag=%s",
+				widgetId, DateFormat.format("h:mmaa", endTime), agency, directionTag, routeTag, stopTag));
 				
 		long now = System.currentTimeMillis();
-		if (now >= endTime) {
+		if (!immediate && now >= endTime.getTimeInMillis()) {
+			// Cancel the alarm if it wasn't a direct tap to update and the end time is passed
+			
+			Log.i(TAG, "onHandleIntent: canceling alarm and scheduling for tomorrow");
 			AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 			alarmManager.cancel(getPendingIntent(getApplicationContext(), intent, widgetId));
-			Log.i(TAG, "onHandleIntent: canceling alarm");
+
+			Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
+			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, widgetId);
+			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, config.getStartObserving());
+			startService(serviceIntent);
+			
 			return;
 		}
 

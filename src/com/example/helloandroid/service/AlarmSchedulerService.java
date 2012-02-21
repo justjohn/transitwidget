@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.text.format.DateFormat;
 import android.util.Log;
 
-import com.example.helloandroid.MBTABackgroundService;
 import com.example.helloandroid.utils.CalendarUtils;
 
 public class AlarmSchedulerService extends IntentService {

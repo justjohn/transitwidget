@@ -1,5 +1,8 @@
-package com.example.helloandroid;
+package com.example.helloandroid.service;
 
+import com.example.helloandroid.R;
+import com.example.helloandroid.R.id;
+import com.example.helloandroid.R.layout;
 import com.example.helloandroid.prefs.NextBusObserverConfig;
 
 import android.app.PendingIntent;
@@ -72,7 +75,8 @@ public class UpdateWidgetService extends Service {
 			// Register an onClickListener to refresh the widget
 			Intent clickIntent = new Intent(this.getApplicationContext(), MBTABackgroundService.class);
 
-			clickIntent.setAction(MBTABackgroundService.ACTION_WAKEUP);
+			clickIntent.setAction(MBTABackgroundService.ACTION_WAKEUP_IMMEDIATE + "-" + widgetId);
+			clickIntent.putExtra(MBTABackgroundService.EXTRA_IMMEDIATE, true);
 			clickIntent.putExtra(MBTABackgroundService.EXTRA_WIDGET_ID, widgetId);
 
 			PendingIntent pendingIntent = PendingIntent.getService(

@@ -10,6 +10,8 @@ import android.util.Log;
 import com.example.helloandroid.provider.TransitServiceDataProvider;
 
 public class Stop {
+	public static final String LOGTAG = Stop.class.getName();
+	
 	public static final String TABLE_NAME = "stops";
 	
     public static final String CONTENT_TYPE = "vnd.android.cursor.dir/transitwidget.service.stop";
@@ -20,6 +22,7 @@ public class Stop {
 	public static final String _ID = BaseColumns._ID;
 	public static final String TITLE = "title";
 	public static final String TAG = "tag";
+	public static final String STOPID = "stopId";
 	public static final String AGENCY = "agency";
 
 	public Stop() {}
@@ -29,17 +32,20 @@ public class Stop {
 		this.tag = cursor.getString(cursor.getColumnIndex(TAG));
 		this.title = cursor.getString(cursor.getColumnIndex(TITLE));
 		this.agency = cursor.getString(cursor.getColumnIndex(AGENCY));
+		this.stopId = cursor.getInt(cursor.getColumnIndex(STOPID));
 	}
 
 	public ContentValues getContentValues() {
 		ContentValues values = new ContentValues();
+		values.put(STOPID, stopId);
 		values.put(TITLE, title);
 		values.put(TAG, tag);
 		values.put(AGENCY, agency);
 		return values;
 	}
-	
+
 	private int id;
+	private int stopId;
 	private String tag;
 	private String title;
 	private String agency;
@@ -85,12 +91,13 @@ public class Stop {
     public static void onCreate(SQLiteDatabase db) {
 		String sql = "CREATE TABLE " + TABLE_NAME + " ( " 
 				   + _ID + " INTEGER PRIMARY KEY, "
+				   + STOPID + " INTEGER, "
 				   + TAG + " TEXT, "
 				   + AGENCY + " TEXT, "
 				   + TITLE + " TEXT"
 			   + " );";
 
-		Log.w(TAG, "Creating service data stop table with sql " + sql);
+		Log.w(LOGTAG, "Creating service data stop table with sql " + sql);
 		db.execSQL(sql);
     }
 
@@ -100,4 +107,12 @@ public class Stop {
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// Nothing to do here (yet)
     }
+
+	public int getStopId() {
+		return stopId;
+	}
+
+	public void setStopId(int stopId) {
+		this.stopId = stopId;
+	}
 }

@@ -10,6 +10,8 @@ import android.util.Log;
 import com.example.helloandroid.provider.TransitServiceDataProvider;
 
 public class Route {
+	public static final String LOGTAG = Route.class.getName();
+	
 	public static final String TABLE_NAME = "routes";
 	
     public static final String CONTENT_TYPE = "vnd.android.cursor.dir/transitwidget.service.route";
@@ -81,7 +83,7 @@ public class Route {
 				   + Route.AGENCY + " TEXT"
 			   + " );";
 
-		Log.w(TAG, "Creating service data route table with sql " + sql);
+		Log.w(LOGTAG, "Creating service data route table with sql " + sql);
 		db.execSQL(sql);
     }
 

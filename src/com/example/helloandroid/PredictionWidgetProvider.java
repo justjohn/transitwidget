@@ -3,6 +3,8 @@ package com.example.helloandroid;
 // import java.util.Random;
 
 // import android.app.PendingIntent;
+import com.example.helloandroid.service.UpdateWidgetService;
+
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
