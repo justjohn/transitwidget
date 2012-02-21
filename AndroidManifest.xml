@@ -31,7 +31,7 @@
         </activity>
 
         <!-- Receiver that will eventually restore alarms after a reboot. -->
-        <receiver android:name=".WakeupReceiver" >
+        <receiver android:name=".receiver.WakeupReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

@@ -94,6 +94,7 @@ public class MBTABackgroundService extends IntentService {
 			AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 			alarmManager.cancel(getPendingIntent(getApplicationContext(), intent, widgetId));
 
+			// Schedule the start time tomorrow
 			Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
 			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, widgetId);
 			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, config.getStartObserving());
