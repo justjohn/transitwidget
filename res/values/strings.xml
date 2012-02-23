@@ -22,7 +22,7 @@
         <item >Harvard</item>
         
     </string-array>
-    <string name="agencyLabel">Agency</string>
+    <string name="agencyLabel">Select Agency</string>
     <string name="startTimeLabel">Start Time</string>
     <string name="endTimeLabel">End Time</string>
     <string-array name="default_agencies">

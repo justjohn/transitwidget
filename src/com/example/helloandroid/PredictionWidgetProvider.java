@@ -1,17 +1,14 @@
 package com.example.helloandroid;
 
-// import java.util.Random;
-
-// import android.app.PendingIntent;
-import com.example.helloandroid.service.UpdateWidgetService;
-
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-// import android.widget.RemoteViews;
+
+import com.example.helloandroid.provider.contract.WidgetConfiguration;
+import com.example.helloandroid.service.UpdateWidgetService;
 
 public class PredictionWidgetProvider extends AppWidgetProvider {
 	private static final String LOG = PredictionWidgetProvider.class.getName();
@@ -19,7 +16,7 @@ public class PredictionWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
-		Log.w(LOG, "onUpdate method called");
+		Log.w(LOG, "Widget onUpdate called for ids: " + appWidgetIds);
 
 		// Get all ids
 		ComponentName thisWidget = new ComponentName(context, PredictionWidgetProvider.class);
@@ -31,5 +28,17 @@ public class PredictionWidgetProvider extends AppWidgetProvider {
 
 		// Update the widgets via the service
 		context.startService(intent);
+	}
+	
+	@Override
+	public void onDeleted(Context context, int[] appWidgetIds) {
+		super.onDeleted(context, appWidgetIds);
+		
+		Log.w(LOG, "Widget onDeleted called for ids: " + appWidgetIds);
+		
+		// Remove widget configuration
+		for (int widgetId : appWidgetIds) {
+			context.getContentResolver().delete(WidgetConfiguration.CONTENT_URI, WidgetConfiguration.WIDGET_ID + " = ?", new String[] { String.valueOf(widgetId) });
+		}
 	}
 }
