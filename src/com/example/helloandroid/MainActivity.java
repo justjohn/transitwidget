@@ -64,15 +64,6 @@ public class MainActivity extends Activity {
         agencyAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.single_list_item, null, new String[] {Agency.TITLE}, new int[] {R.id.value});
         agencySpinner.setAdapter(agencyAdapter);
         
-        loadAgencyList();
-        
-        long selectedAgency = getSharedPreferences("prefs", MODE_PRIVATE).getLong("agency", -1);
-        int position = 0;
-        if (selectedAgency > 0) {
-        	position = AdapterUtils.getAdapterPositionById(agencySpinner.getAdapter(), selectedAgency);
-        }
-        agencySpinner.setSelection(position);
-        
         agencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
 				Cursor cursor = getContentResolver().query(ContentUris.withAppendedId(Agency.CONTENT_URI, id), new String[] { Agency.TAG }, null, null, null);
@@ -96,6 +87,8 @@ public class MainActivity extends Activity {
 			}
 		});
 
+        loadAgencyList();
+        
         String[] from = {Route.TITLE};
         int[] to = {R.id.value};
 
@@ -161,6 +154,13 @@ public class MainActivity extends Activity {
     	        startManagingCursor(cursor);
     	    	agencyAdapter.changeCursor(cursor);
     	    	dialog.hide();
+
+    	        long selectedAgency = getSharedPreferences("prefs", MODE_PRIVATE).getLong("agency", -1);
+    	        int position = 0;
+    	        if (selectedAgency > 0) {
+    	        	position = AdapterUtils.getAdapterPositionById(agencySpinner.getAdapter(), selectedAgency);
+    	        }
+    	        agencySpinner.setSelection(position);
     		}
     	}.execute("");
     }
