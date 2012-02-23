@@ -47,7 +47,10 @@ public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getName();
     
     private ListView routeList; 
+    private Spinner agencySpinner;
+    
     private SimpleCursorAdapter routeAdapter;
+    private SimpleCursorAdapter agencyAdapter;
     
 	/** Called when the activity is first created. */
     @Override
@@ -57,11 +60,11 @@ public class MainActivity extends Activity {
         
         routeList = (ListView)findViewById(R.id.listView);
 
-        Cursor agencyCursor = getContentResolver().query(Agency.CONTENT_URI, null, null, null, null);
-        startManagingCursor(agencyCursor);
-
-        Spinner agencySpinner = (Spinner) findViewById(R.id.agencySpinner);
-        agencySpinner.setAdapter(new SimpleCursorAdapter(getApplicationContext(), R.layout.single_list_item, agencyCursor, new String[] {Agency.TITLE}, new int[] {R.id.value}));
+        agencySpinner = (Spinner) findViewById(R.id.agencySpinner);
+        agencyAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.single_list_item, null, new String[] {Agency.TITLE}, new int[] {R.id.value});
+        agencySpinner.setAdapter(agencyAdapter);
+        
+        loadAgencyList();
         
         long selectedAgency = getSharedPreferences("prefs", MODE_PRIVATE).getLong("agency", -1);
         int position = 0;
@@ -111,7 +114,7 @@ public class MainActivity extends Activity {
     	new AsyncTask<String, Integer, Cursor>() {
     		ProgressDialog dialog;
     		protected void onPreExecute() {
-    			dialog = ProgressDialog.show(activity, "", "Loading. Please wait...", true);
+    			dialog = ProgressDialog.show(activity, "", "Loading Routes. Please wait...", true);
     			
     		}
     		@Override
@@ -132,6 +135,34 @@ public class MainActivity extends Activity {
     	    	dialog.hide();
     		}
     	}.execute(agencyTag);
+    }
+
+    public void loadAgencyList() {
+    	final Activity activity = this;
+    	
+    	new AsyncTask<String, Integer, Cursor>() {
+    		ProgressDialog dialog;
+    		protected void onPreExecute() {
+    			dialog = ProgressDialog.show(activity, "", "Loading Transit Agencies. Please wait...", true);
+    		}
+    		@Override
+    		protected Cursor doInBackground(String... params) {
+    	        Cursor cursor = getContentResolver().query(Agency.CONTENT_URI, null, null, null, null);
+
+    	    	if (cursor.getCount() == 0) {
+    	    		// load from network and cache to DB.
+    				ServiceProvider.getAgencies(getApplicationContext());
+    		    	cursor.requery();
+    	    	}
+    	    	
+    	    	return cursor;
+    		}
+    		protected void onPostExecute(Cursor cursor) {
+    	        startManagingCursor(cursor);
+    	    	agencyAdapter.changeCursor(cursor);
+    	    	dialog.hide();
+    		}
+    	}.execute("");
     }
     
     public int getTimeFromBeginingOfDay(Calendar cal) {
