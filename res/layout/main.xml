@@ -11,15 +11,17 @@
         android:paddingTop="5dp"
         android:paddingLeft="15dp" />
     
-    <Spinner
+    <com.example.helloandroid.NoDefaultSpinner
+        android:prompt="@string/empty"
         android:id="@+id/agencySpinner"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="55dp" />
         
-    <ListView
-    	android:id="@+id/listView"
+    
+    <FrameLayout
+        android:id="@+id/main_fragment_container"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-    	/>
+         />
     
 </LinearLayout>

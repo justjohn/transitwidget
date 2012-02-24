@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 
@@ -35,19 +36,14 @@ import com.example.helloandroid.utils.CalendarUtils;
 public class MBTAWidgetConfig extends Activity {
     static final String TAG = "MBTAWidgetConfig";
 
-    private static final String PREFS_NAME
-            = "com.mbta.widget.MBTAWidgetProvider";
-    
-    private static final String PREF_ROUTE = "prefix_route_";
-    private static final String PREF_START = "prefix_start_";
-    private static final String PREF_END = "prefix_end_";
-    
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     
-    Spinner agencySpinner;
-    Spinner routeSpinner;
-    Spinner directionSpinner;
-    Spinner endPointSpinner;
+    NoDefaultSpinner agencySpinner;
+    NoDefaultSpinner routeSpinner;
+    NoDefaultSpinner directionSpinner;
+    NoDefaultSpinner stopSpinner;
+    
+    Button saveButton;
     
     BaseItemAdapter<NextBusRoute> routeAdapter;
     BaseItemAdapter<NextBusAgency> agencyAdapter;
@@ -67,15 +63,51 @@ public class MBTAWidgetConfig extends Activity {
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
 
-        Log.i(TAG, "config ui widget");
         // Set the view layout resource to use.
         setContentView(R.layout.widget_config);
 
-        Log.i(TAG, "config save button");
         // Bind the action for the save button.
-        findViewById(R.id.saveBtn).setOnClickListener(SaveOnClickListener);
+        saveButton = (Button) findViewById(R.id.saveBtn);
+        saveButton.setEnabled(false);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final Context context = MBTAWidgetConfig.this;
 
-        findViewById(R.id.cancelBtn).setOnClickListener(CancelOnClickListener);
+                // Until there are UI selectors, we'll start in 5 seconds and run for 10 minutes.
+    			Calendar cal = Calendar.getInstance();
+    			cal.add(Calendar.SECOND, 5); // start 5 seconds from now
+    			int trigger_time = CalendarUtils.getTimeFromBeginingOfDay(cal);
+    			int end_time = trigger_time + 600; // 10 minutes
+    			
+    			config.setStartObserving(trigger_time);
+    			config.setStopObserving(end_time);
+    			
+                // When the button is clicked, save the string in our prefs and return that they
+                // clicked OK.
+                savePreferences(context, mAppWidgetId);
+
+                // Push widget update to surface with newly set prefix
+                //AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+
+                // Make sure we pass back the original appWidgetId
+                Intent resultValue = new Intent();
+                resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+                setResult(RESULT_OK, resultValue);
+
+    			Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
+    			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, mAppWidgetId);
+    			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, trigger_time);
+    			startService(serviceIntent);
+    			
+                finish();
+            }
+        });
+
+        findViewById(R.id.cancelBtn).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
         
         // Find the widget id from the intent. 
         Intent intent = getIntent();
@@ -90,30 +122,54 @@ public class MBTAWidgetConfig extends Activity {
             //finish();
         }
         
-        Log.i(TAG, "config agency spinner");
-        agencySpinner = (Spinner) findViewById(R.id.agencySpinner);
-        agencySpinner.setOnItemSelectedListener(AgencyItemSelectListener);
-        ArrayAdapter agencyAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-        agencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        agencySpinner.setAdapter(agencyAdapter);
+        agencySpinner = (NoDefaultSpinner) findViewById(R.id.agencySpinner);
+        routeSpinner = (NoDefaultSpinner) findViewById(R.id.routeSpinner);
+        directionSpinner = (NoDefaultSpinner) findViewById(R.id.directionSpinner);
+        stopSpinner = (NoDefaultSpinner) findViewById(R.id.endPointSpinner);
+
+        resetRouteSpinner();
+        resetDirectionSpinner();
+        resetStopSpinner();
         
-        Log.i(TAG, "config route spinner");
-        routeSpinner = (Spinner) findViewById(R.id.routeSpinner);
-        routeSpinner.setOnItemSelectedListener(RouteItemSelectListener);
-        ArrayAdapter routeAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-        routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        routeSpinner.setAdapter(routeAdapter);
+        agencySpinner.setEnabled(false);
+        agencySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+    		public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long id) {
+    			Log.i(TAG, "Agency selected: " + id);
+    	        resetRouteSpinner();
+    	        resetDirectionSpinner();
+    	        resetStopSpinner();
+    			updateRoute();
+    		}
+    		public void onNothingSelected(AdapterView<?> arg0) {}
+        });
+        
+        routeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+    		public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long id) {
+    			Log.i(TAG, "Route selected: " + id);
+    	        resetDirectionSpinner();
+    	        resetStopSpinner();
+    			updateDirection();
+    		}
+    		public void onNothingSelected(AdapterView<?> arg0) {}
+        });
      
-        directionSpinner = (Spinner) findViewById(R.id.directionSpinner);
-        directionSpinner.setOnItemSelectedListener(DirectionItemSelectListener);
-        ArrayAdapter directionAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-        directionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        directionSpinner.setAdapter(directionAdapter);
+        directionSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+    		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+    	        resetStopSpinner();
+    			updateStop();
+    		}
+    		public void onNothingSelected(AdapterView<?> arg0) {}
+        });
         
-        endPointSpinner = (Spinner) findViewById(R.id.endPointSpinner);
-        ArrayAdapter endPointAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-        endPointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        endPointSpinner.setAdapter(routeAdapter);
+        stopSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> arg0, View arg1,int arg2, long arg3) {
+		        saveButton.setEnabled(true);
+			}
+
+			public void onNothingSelected(AdapterView<?> arg0) {
+		        saveButton.setEnabled(false);
+			}
+        });
         
         config = new NextBusObserverConfig(MBTAWidgetConfig.this, mAppWidgetId);
         new UpdateAgencies().execute(config);
@@ -121,132 +177,59 @@ public class MBTAWidgetConfig extends Activity {
         Log.i(TAG, "End OnCreate");
     }
 
-    View.OnClickListener SaveOnClickListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            final Context context = MBTAWidgetConfig.this;
+	private void resetRouteSpinner() {
+        routeSpinner.setEnabled(false);
+		ArrayAdapter routeAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
+        routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        routeSpinner.setAdapter(routeAdapter);
+	}
 
-            // Until there are UI selectors, we'll start in 5 seconds and run for 10 minutes.
-			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.SECOND, 5); // start 5 seconds from now
-			int trigger_time = CalendarUtils.getTimeFromBeginingOfDay(cal);
-			int end_time = trigger_time + 600; // 10 minutes
-			
-			config.setStartObserving(trigger_time);
-			config.setStopObserving(end_time);
-			
-            // When the button is clicked, save the string in our prefs and return that they
-            // clicked OK.
-            savePreferences(context, mAppWidgetId);
+	private void resetStopSpinner() {
+        stopSpinner.setEnabled(false);
+		ArrayAdapter stopAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
+        stopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        stopSpinner.setAdapter(stopAdapter);
 
-            // Push widget update to surface with newly set prefix
-            //AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        saveButton.setEnabled(false);
+	}
 
-            // Make sure we pass back the original appWidgetId
-            Intent resultValue = new Intent();
-            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            setResult(RESULT_OK, resultValue);
-
-			Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
-			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, mAppWidgetId);
-			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, trigger_time);
-			startService(serviceIntent);
-			
-            finish();
-        }
-    };
-
-    View.OnClickListener CancelOnClickListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            finish();
-        }
-    };
-    
-    ListView.OnItemSelectedListener AgencyItemSelectListener = new OnItemSelectedListener() {
-		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) {
-			updateRoute();
-		}
-
-		public void onNothingSelected(AdapterView<?> arg0) {
-			updateRoute();
-		}
-    };
-    
-    ListView.OnItemSelectedListener RouteItemSelectListener = new OnItemSelectedListener() {
-		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) {
-			updateDirection();
-		}
-
-		public void onNothingSelected(AdapterView<?> arg0) {
-			updateDirection();
-		}
-    };
-    
-    ListView.OnItemSelectedListener DirectionItemSelectListener = new OnItemSelectedListener() {
-		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-				long arg3) {
-			updateEndPoint();
-		}
-
-		public void onNothingSelected(AdapterView<?> arg0) {
-			updateEndPoint();
-		}
-    };
+	private void resetDirectionSpinner() {
+        directionSpinner.setEnabled(false);
+		ArrayAdapter directionAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
+        directionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        directionSpinner.setAdapter(directionAdapter);
+	}
     
     // Write the prefix to the SharedPreferences object for this widget
     void savePreferences(Context context, int appWidgetId) {
-        SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
-        prefs.putString(PREF_ROUTE + appWidgetId, routeSpinner.getSelectedItem().toString());
-        prefs.putString(PREF_START + appWidgetId, routeSpinner.getSelectedItem().toString());
-        prefs.putString(PREF_END + appWidgetId, routeSpinner.getSelectedItem().toString());
-        prefs.commit();
-        
         int pos;
-        pos = endPointSpinner.getSelectedItemPosition();
+        pos = stopSpinner.getSelectedItemPosition();
         config.setStop((NextBusStop) endPointAdapter.getItem(pos));
         config.save();
         Log.i(TAG, config.getStops().toString());
     }
 
     void updateRoute() {
-    	if(agencySpinner.getSelectedItemPosition() > 0) {
+    	if(agencySpinner.getSelectedItemPosition() >= 0) {
     		int pos = agencySpinner.getSelectedItemPosition();
             config.setAgency((NextBusAgency) agencyAdapter.getItem(pos));
     		new UpdateRoutes().execute(config);
-    	} else {
-    		// No Route Selected
-    		ArrayAdapter routeAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-    		routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            routeSpinner.setAdapter(routeAdapter);
     	}
     }
     
     void updateDirection() {
-    	if(routeSpinner.getSelectedItemPosition() > 0) {
+    	if(routeSpinner.getSelectedItemPosition() >= 0) {
     		int pos = routeSpinner.getSelectedItemPosition();
             config.setRoute((NextBusRoute) routeAdapter.getItem(pos));
     		new UpdateDirection().execute(config);
-    	} else {
-    		// No Route Selected
-    		ArrayAdapter directionAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-    		directionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            directionSpinner.setAdapter(directionAdapter);
     	}
-    	
-    	
     }
     
-    void updateEndPoint() {
-    	if(directionSpinner.getSelectedItemPosition() > 0) {
+    void updateStop() {
+    	if(directionSpinner.getSelectedItemPosition() >= 0) {
     		int pos = directionSpinner.getSelectedItemPosition();
             config.setDirection((NextBusDirection) directionAdapter.getItem(pos));
     		new UpdateEndPoint().execute(config);
-    	} else {
-    		// No Route Selected
-    		ArrayAdapter endPointAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-    		endPointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            endPointSpinner.setAdapter(endPointAdapter);
     	}
     }
     
@@ -260,6 +243,7 @@ public class MBTAWidgetConfig extends Activity {
         	agencyAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
         	agencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         	agencySpinner.setAdapter(agencyAdapter);
+        	agencySpinner.setEnabled(true);
         }
     }
     
@@ -273,6 +257,7 @@ public class MBTAWidgetConfig extends Activity {
         	routeAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
         	routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         	routeSpinner.setAdapter(routeAdapter);
+        	routeSpinner.setEnabled(true);
         }
     }
     
@@ -286,6 +271,7 @@ public class MBTAWidgetConfig extends Activity {
         	directionAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
         	directionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         	directionSpinner.setAdapter(directionAdapter);
+        	directionSpinner.setEnabled(true);
         }
     }
     
@@ -298,7 +284,9 @@ public class MBTAWidgetConfig extends Activity {
         protected void onPostExecute(List<NextBusStop> result) {
         	endPointAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
         	endPointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	endPointSpinner.setAdapter(endPointAdapter);
+        	stopSpinner.setAdapter(endPointAdapter);
+        	stopSpinner.setEnabled(true);
+            saveButton.setEnabled(false);
         }
     }
 }
