@@ -37,9 +37,8 @@ public class DirectionListFragment extends ListFragment {
     }
     
     @Override
-    public void onResume() {
-    	super.onResume();
-
+    public void onStart() {
+    	super.onStart();
         String agencyTag = getArguments().getString(ARG_AGENCY_TAG);
         String routeTag = getArguments().getString(ARG_ROUTE_TAG);
         
@@ -70,8 +69,8 @@ public class DirectionListFragment extends ListFragment {
     		protected void onPostExecute(Cursor cursor) {
     			activity.startManagingCursor(cursor);
     			mAdapter.changeCursor(cursor);
-    			if (getListView() != null) {
-    				setListShown(true);	
+    			if (isVisible()) {
+    				setListShown(true);
     			}
     		}
     	}.execute("");

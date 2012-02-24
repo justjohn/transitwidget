@@ -21,9 +21,9 @@ public class RouteListFragment extends ListFragment {
     private Listener mListener;
     
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-    	super.onViewCreated(view, savedInstanceState);
-
+    public void onStart() {
+    	super.onStart();
+    	
     	mListener = (Listener)getActivity();
     	
         String[] from = {Route.TITLE};
@@ -31,12 +31,7 @@ public class RouteListFragment extends ListFragment {
         
         mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.single_list_item, null, from, to);
         setListAdapter(mAdapter);
-    }
-    
-    @Override
-    public void onResume() {
-    	super.onResume();
-
+        
         String agencyTag = getArguments().getString(ARG_AGENCY_TAG);
         loadRouteList(agencyTag);
     }
@@ -63,7 +58,9 @@ public class RouteListFragment extends ListFragment {
     		protected void onPostExecute(Cursor cursor) {
     			activity.startManagingCursor(cursor);
     			mAdapter.changeCursor(cursor);
-    			setListShown(true);
+    			if (isVisible()) {
+    				setListShown(true);
+    			}
     		}
     	}.execute(agencyTag);
     }

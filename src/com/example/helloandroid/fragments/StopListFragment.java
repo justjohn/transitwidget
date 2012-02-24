@@ -72,7 +72,9 @@ public class StopListFragment extends ListFragment {
     		protected void onPostExecute(Cursor cursor) {
     			activity.startManagingCursor(cursor);
     			mAdapter.changeCursor(cursor);
-    			setListShown(true);
+    			if (isVisible()) {
+    				setListShown(true);
+    			}
     		}
     	}.execute("");
     }

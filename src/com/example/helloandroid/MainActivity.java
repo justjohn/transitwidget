@@ -44,6 +44,29 @@ public class MainActivity extends FragmentActivity implements RouteListFragment.
         setContentView(R.layout.main);
         
         agencySpinner = (NoDefaultSpinner) findViewById(R.id.agencySpinner);
+        agencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+				Cursor cursor = getContentResolver().query(ContentUris.withAppendedId(Agency.CONTENT_URI, id), new String[] { Agency.TAG }, null, null, null);
+				String tag = null;
+				if (cursor.moveToFirst()) {
+					tag = cursor.getString(0);
+				}
+
+				getSharedPreferences(PREFS, MODE_PRIVATE).edit()
+						.putLong("agency", id)
+						.putString("agencyTag", tag)
+					.commit();
+				
+				if (tag != null) {
+					mAgency = tag;
+					loadRouteList();
+				}
+			}
+
+			public void onNothingSelected(AdapterView<?> arg0) {
+				getSharedPreferences(PREFS, MODE_PRIVATE).edit().clear().commit();
+			}
+		});
         
         mAgency = getSharedPreferences(PREFS, MODE_PRIVATE).getString("agencyTag", null);
         
@@ -105,30 +128,6 @@ public class MainActivity extends FragmentActivity implements RouteListFragment.
     	        	position = AdapterUtils.getAdapterPositionById(agencySpinner.getAdapter(), selectedAgency);
     	        }
     	        agencySpinner.setSelection(position);
-
-    	        agencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-    				public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-    					Cursor cursor = getContentResolver().query(ContentUris.withAppendedId(Agency.CONTENT_URI, id), new String[] { Agency.TAG }, null, null, null);
-    					String tag = null;
-    					if (cursor.moveToFirst()) {
-    						tag = cursor.getString(0);
-    					}
-
-    					getSharedPreferences(PREFS, MODE_PRIVATE).edit()
-    							.putLong("agency", id)
-    							.putString("agencyTag", tag)
-    						.commit();
-    					
-    					if (tag != null) {
-    						mAgency = tag;
-    						loadRouteList();
-    					}
-    				}
-
-    				public void onNothingSelected(AdapterView<?> arg0) {
-    					getSharedPreferences(PREFS, MODE_PRIVATE).edit().clear().commit();
-    				}
-    			});
     		}
     	}.execute("");
     }
