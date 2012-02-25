@@ -27,8 +27,6 @@ public class Agency extends BaseItem {
 	public static final String SHORT_TITLE = "short_title";
 	public static final String REGION_TITLE = "region_title";
 
-	private static final String LOG = Agency.class.getName();
-
 	public Agency() {}
 	
 	public Agency(Cursor cursor) {
