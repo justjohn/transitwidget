@@ -13,8 +13,6 @@ import android.widget.SimpleCursorAdapter;
 import com.example.helloandroid.R;
 import com.example.helloandroid.api.ServiceProvider;
 import com.example.helloandroid.feed.model.Direction;
-import com.example.helloandroid.feed.model.Route;
-import com.example.helloandroid.feed.model.Stop;
 
 public class DirectionListFragment extends ListFragment {
     public static final String ARG_AGENCY_TAG = "agencyTag";
