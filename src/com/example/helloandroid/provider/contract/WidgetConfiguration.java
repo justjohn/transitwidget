@@ -1,15 +1,11 @@
 package com.example.helloandroid.provider.contract;
 
-import com.example.helloandroid.provider.WidgetConfigurationProvider;
-
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.util.Log;
+
+import com.example.helloandroid.provider.WidgetConfigurationProvider;
 
 public class WidgetConfiguration {
-	private static final String TAG = WidgetConfiguration.class.getName();
-
 	public static final String TABLE_NAME = "widget_configuration";
 
     public static final String CONTENT_TYPE = "vnd.android.cursor.dir/transitwidget.widget.configuration";
