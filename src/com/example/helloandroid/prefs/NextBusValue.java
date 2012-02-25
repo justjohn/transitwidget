@@ -9,9 +9,17 @@ import com.example.helloandroid.adapters.BaseItem;
  * @author james
  *
  */
-abstract class NextBusValue extends BaseItem {
+public class NextBusValue extends BaseItem {
 	private String shortLabel;
 	private String longLabel;
+	
+	public NextBusValue() {
+		init(null, null, null);
+	}
+	
+	public NextBusValue(String label) {
+		init(label, label, null);
+	}
 	
 	public void init(String shortLabel, String longLabel, String tag) {
 		this.shortLabel = shortLabel;
