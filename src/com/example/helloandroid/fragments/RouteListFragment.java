@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
