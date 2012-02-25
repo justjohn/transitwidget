@@ -1,25 +1,21 @@
 package com.example.helloandroid;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
-
-import java.util.Calendar;
-import java.util.List;
 
 import com.example.helloandroid.adapters.BaseItemAdapter;
 import com.example.helloandroid.prefs.NextBusAgency;
@@ -27,6 +23,7 @@ import com.example.helloandroid.prefs.NextBusDirection;
 import com.example.helloandroid.prefs.NextBusObserverConfig;
 import com.example.helloandroid.prefs.NextBusRoute;
 import com.example.helloandroid.prefs.NextBusStop;
+import com.example.helloandroid.prefs.NextBusValue;
 import com.example.helloandroid.service.AlarmSchedulerService;
 import com.example.helloandroid.utils.CalendarUtils;
 
@@ -45,10 +42,10 @@ public class MBTAWidgetConfig extends Activity {
     
     Button saveButton;
     
-    BaseItemAdapter<NextBusRoute> routeAdapter;
-    BaseItemAdapter<NextBusAgency> agencyAdapter;
-    BaseItemAdapter<NextBusDirection> directionAdapter;
-    BaseItemAdapter<NextBusStop> endPointAdapter;
+    BaseItemAdapter<? extends NextBusValue> routeAdapter;
+    BaseItemAdapter<? extends NextBusValue> agencyAdapter;
+    BaseItemAdapter<? extends NextBusValue> directionAdapter;
+    BaseItemAdapter<? extends NextBusValue> endPointAdapter;
     NextBusObserverConfig config;
     
     public MBTAWidgetConfig() {
@@ -177,27 +174,34 @@ public class MBTAWidgetConfig extends Activity {
         Log.i(TAG, "End OnCreate");
     }
 
+    private BaseItemAdapter<NextBusValue> createAdapter(List<? extends NextBusValue> data, Spinner spinner) {
+		ArrayList<NextBusValue> tmp = new ArrayList<NextBusValue>();
+		BaseItemAdapter<NextBusValue> adapter;
+		
+		tmp.add(new NextBusValue("Unspecified"));
+		if(data != null) {
+			tmp.addAll(data);
+		}
+		adapter =  new BaseItemAdapter<NextBusValue>(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, tmp);
+    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        return adapter;
+	}
+    
 	private void resetRouteSpinner() {
         routeSpinner.setEnabled(false);
-		ArrayAdapter routeAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-        routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        routeSpinner.setAdapter(routeAdapter);
+		routeAdapter = createAdapter(null, routeSpinner);
 	}
 
 	private void resetStopSpinner() {
         stopSpinner.setEnabled(false);
-		ArrayAdapter stopAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-        stopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        stopSpinner.setAdapter(stopAdapter);
-
+        endPointAdapter = createAdapter(null, stopSpinner);
         saveButton.setEnabled(false);
 	}
 
 	private void resetDirectionSpinner() {
         directionSpinner.setEnabled(false);
-		ArrayAdapter directionAdapter = ArrayAdapter.createFromResource(this, R.array.default_spinner, android.R.layout.simple_spinner_item);
-        directionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        directionSpinner.setAdapter(directionAdapter);
+		directionAdapter = createAdapter(null, directionSpinner);
 	}
     
     // Write the prefix to the SharedPreferences object for this widget
@@ -240,9 +244,7 @@ public class MBTAWidgetConfig extends Activity {
 		}
 
         protected void onPostExecute(List<NextBusAgency> result) {
-        	agencyAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
-        	agencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	agencySpinner.setAdapter(agencyAdapter);
+        	agencyAdapter = createAdapter(result, agencySpinner);
         	agencySpinner.setEnabled(true);
         }
     }
@@ -254,9 +256,7 @@ public class MBTAWidgetConfig extends Activity {
 		}
 
         protected void onPostExecute(List<NextBusRoute> result) {
-        	routeAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
-        	routeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	routeSpinner.setAdapter(routeAdapter);
+        	routeAdapter = createAdapter(result, routeSpinner);
         	routeSpinner.setEnabled(true);
         }
     }
@@ -268,9 +268,7 @@ public class MBTAWidgetConfig extends Activity {
 		}
 
         protected void onPostExecute(List<NextBusDirection> result) {
-        	directionAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
-        	directionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	directionSpinner.setAdapter(directionAdapter);
+        	directionAdapter = createAdapter(result, directionSpinner);
         	directionSpinner.setEnabled(true);
         }
     }
@@ -282,9 +280,7 @@ public class MBTAWidgetConfig extends Activity {
 		}
 
         protected void onPostExecute(List<NextBusStop> result) {
-        	endPointAdapter = new BaseItemAdapter(MBTAWidgetConfig.this, android.R.layout.simple_spinner_item, result);
-        	endPointAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        	stopSpinner.setAdapter(endPointAdapter);
+        	endPointAdapter = createAdapter(result, stopSpinner);
         	stopSpinner.setEnabled(true);
             saveButton.setEnabled(false);
         }
