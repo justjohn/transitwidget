@@ -11,9 +11,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import com.example.helloandroid.R;
-import com.example.helloandroid.api.ServiceProvider;
 import com.example.helloandroid.feed.model.Direction;
-import com.example.helloandroid.feed.model.Route;
 import com.example.helloandroid.feed.model.Stop;
 import com.example.helloandroid.utils.StringUtils;
 
