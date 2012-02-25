@@ -1,18 +1,15 @@
 package com.example.helloandroid.service;
 
-import com.example.helloandroid.R;
-import com.example.helloandroid.R.id;
-import com.example.helloandroid.R.layout;
-import com.example.helloandroid.prefs.NextBusObserverConfig;
-
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
+
+import com.example.helloandroid.R;
+import com.example.helloandroid.prefs.NextBusObserverConfig;
 
 public class UpdateWidgetService extends Service {
 	private static final String TAG = UpdateWidgetService.class.getName();
