@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 
 import com.example.helloandroid.api.ServiceProvider;
 import com.example.helloandroid.feed.model.Agency;
