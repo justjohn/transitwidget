@@ -1,5 +1,7 @@
 package com.example.helloandroid;
 
+import java.util.Arrays;
+
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
@@ -15,8 +17,7 @@ public class PredictionWidgetProvider extends AppWidgetProvider {
 	
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-
-		Log.w(LOG, "Widget onUpdate called for ids: " + appWidgetIds);
+		Log.w(LOG, "Widget onUpdate called for ids: " + Arrays.toString(appWidgetIds));
 
 		// Get all ids
 		ComponentName thisWidget = new ComponentName(context, PredictionWidgetProvider.class);

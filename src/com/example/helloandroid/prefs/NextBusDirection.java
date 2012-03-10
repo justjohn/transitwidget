@@ -25,6 +25,7 @@ public class NextBusDirection extends NextBusValue {
 	}
 
 	public void initFromTag(String tag) {
+		throw new UnsupportedOperationException();
 		
 	}
 }

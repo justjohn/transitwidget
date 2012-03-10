@@ -183,9 +183,9 @@ public class ServiceProvider {
 				// Persist stops
 				for (Stop stop : direction.getStops()) {
 					stop.setAgency(agencyTag);
-					String sotpSelection = Stop.TAG + " = ? AND " + Stop.AGENCY + " = ?";
+					String stopSelection = Stop.TAG + " = ? AND " + Stop.AGENCY + " = ?";
 					String[] stopSelectionArgs = { stop.getTag(), stop.getAgency() };
-					Cursor stopCursor = ctx.getContentResolver().query(Stop.CONTENT_URI, null, sotpSelection, stopSelectionArgs, null);
+					Cursor stopCursor = ctx.getContentResolver().query(Stop.CONTENT_URI, null, stopSelection, stopSelectionArgs, null);
 					if (!stopCursor.moveToFirst()) {
 						// only add the stop if it doesn't exist
 						// Log.d(TAG, "Persisting stop " + stop + " to database.");

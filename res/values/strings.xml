@@ -2,7 +2,7 @@
 <resources>
 
     <string name="empty"></string>
-    <string name="app_name">Transit Widget</string>
+    <string name="app_name">AAAA Transit Widget</string>
     
     <string name="saveBtnLabel">Save</string>
     <string name="cancelBtnLabel">Cancel</string>
@@ -23,4 +23,21 @@
     <string name="stopLabel">Select Stop</string>
 
     <string name="spinnerLabel">Unspecified</string>
+    <string name="which_bus_preferences">Which Bus?</string>
+
+    <string name="which_agency_title">Agency</string>
+    <string name="which_agency_dialog_title">Select the Agency</string>
+    <string name="which_agency_summary">Transit Authority or Bus Company</string>
+
+    <string name="which_route_title">Route</string>
+    <string name="which_route_dialog_title">Select the Route</string>
+    <string name="which_route_summary">Bus, Subway or Train Route</string>
+
+    <string name="which_direction_title">Direction</string>
+    <string name="which_direction_dialog_title">Select the Direction</string>
+    <string name="which_direction_summary">Direction, Destination or Variation</string>
+
+    <string name="which_stop_title">Stop</string>
+    <string name="which_stop_dialog_title">Select the Stop</string>
+    <string name="which_stop_summary">Bus Stop, Subway or Train Station</string>
 </resources>

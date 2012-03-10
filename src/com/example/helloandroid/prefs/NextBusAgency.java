@@ -9,6 +9,6 @@ public class NextBusAgency extends NextBusValue {
 	}
 
 	public void initFromTag(String tag) {
-		
+		throw new UnsupportedOperationException();
 	}
 }

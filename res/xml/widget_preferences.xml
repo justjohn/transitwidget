@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/which_bus_preferences" >
+        <ListPreference
+            android:key="which_agency_preference"
+            android:dialogTitle="@string/which_agency_dialog_title"
+            android:summary="@string/which_agency_summary"
+            android:title="@string/which_agency_title" />
+        <ListPreference
+            android:key="which_route_preference"
+            android:dependency="which_agency_preference"
+            android:dialogTitle="@string/which_route_dialog_title"
+            android:summary="@string/which_route_summary"
+            android:title="@string/which_route_title"  />
+        <ListPreference
+            android:key="which_direction_preference"
+            android:dependency="which_route_preference"
+            android:dialogTitle="@string/which_direction_dialog_title"
+            android:summary="@string/which_direction_summary"
+            android:title="@string/which_direction_title"  />
+        <ListPreference
+            android:key="which_stop_preference"
+            android:dependency="which_direction_preference"
+            android:dialogTitle="@string/which_stop_dialog_title"
+            android:summary="@string/which_stop_summary"
+            android:title="@string/which_stop_title"  />
+        </PreferenceCategory>
+
+</PreferenceScreen>

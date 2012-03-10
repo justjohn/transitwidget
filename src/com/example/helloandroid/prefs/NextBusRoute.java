@@ -9,6 +9,7 @@ public class NextBusRoute extends NextBusValue {
 	}
 
 	public void initFromTag(String tag) {
+		throw new UnsupportedOperationException();
 		
 	}
 }
