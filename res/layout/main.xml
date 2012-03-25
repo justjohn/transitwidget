@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_height="fill_parent">
     
-    <TextView 
-        android:text="@string/agencyLabel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        android:paddingLeft="15dp" />
-    
-    <com.example.helloandroid.NoDefaultSpinner
+    <com.transitwidget.NoDefaultSpinner
+        android:layout_alignParentTop="true"
         android:prompt="@string/empty"
         android:id="@+id/agencySpinner"
         android:layout_width="fill_parent"
         android:layout_height="55dp" />
         
+    <TextView 
+        android:layout_below="@id/agencySpinner"
+        android:id="@+id/breadcrumbs"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp" 
+        android:background="#333"
+        android:textStyle="bold" />
     
     <FrameLayout
         android:id="@+id/main_fragment_container"
+        android:layout_below="@id/breadcrumbs"
+        android:layout_alignParentBottom="true"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
          />
     
-</LinearLayout>
+</RelativeLayout>

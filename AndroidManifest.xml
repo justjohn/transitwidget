@@ -1,39 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.helloandroid"
+    package="com.transitwidget"
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="11" />
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:icon="@drawable/eta_launcher_v2"
-        android:label="@string/app_name" >
-<!--          
-        <activity android:name=".MBTAWidgetConfig"
+        android:label="@string/app_name"
+        android:hardwareAccelerated="true" >
+        
+        <activity android:name=".WidgetConfigActivity"
             android:label="@string/app_name">
     		<intent-filter>
         		<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
     		</intent-filter>
 		</activity>
-   -->		
-        
-        <activity
-            android:name=".TransitWidgetConfiguration"
-            android:label="AAAAAAA Transit Widget">
-            <intent-filter>
-        		<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
-            </intent-filter>
-        </activity>
-        
-        
         
         <activity
             android:name=".MainActivity"
-            android:label="AAAAAAA Transit Widget" >
+            android:label="@string/app_name"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

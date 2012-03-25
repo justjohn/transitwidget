@@ -4,7 +4,5 @@
      android:minHeight="36dp"
      android:minWidth="292dp"
      android:updatePeriodMillis="1800"
-     android:configure="com.example.helloandroid.TransitWidgetConfiguration" ignore-this="com.example.helloandroid.MBTAWidgetConfig">
-    
-
+     android:configure="com.transitwidget.WidgetConfigActivity">
 </appwidget-provider>

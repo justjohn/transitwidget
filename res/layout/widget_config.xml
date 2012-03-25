@@ -44,7 +44,7 @@
             android:text="@string/agencyLabel"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.example.helloandroid.NoDefaultSpinner
+        <com.transitwidget.NoDefaultSpinner
             android:prompt="@string/spinnerLabel"
             android:id="@+id/agencySpinner"
             android:layout_width="fill_parent"
@@ -58,7 +58,7 @@
             android:text="@string/routeLabel"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.example.helloandroid.NoDefaultSpinner
+        <com.transitwidget.NoDefaultSpinner
             android:prompt="@string/spinnerLabel"
             android:id="@+id/routeSpinner"
             android:layout_width="fill_parent"
@@ -72,7 +72,7 @@
             android:text="@string/directionLabel"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         
-    	<com.example.helloandroid.NoDefaultSpinner
+    	<com.transitwidget.NoDefaultSpinner
             android:prompt="@string/spinnerLabel"
             android:id="@+id/directionSpinner"
             android:layout_width="fill_parent"
@@ -86,7 +86,7 @@
             android:text="@string/endPointLabel"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <com.example.helloandroid.NoDefaultSpinner
+        <com.transitwidget.NoDefaultSpinner
             android:prompt="@string/spinnerLabel"
             android:id="@+id/endPointSpinner"
             android:layout_width="fill_parent"

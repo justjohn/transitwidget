@@ -2,7 +2,7 @@
 <resources>
 
     <string name="empty"></string>
-    <string name="app_name">AAAA Transit Widget</string>
+    <string name="app_name">Transit Widget</string>
     
     <string name="saveBtnLabel">Save</string>
     <string name="cancelBtnLabel">Cancel</string>
