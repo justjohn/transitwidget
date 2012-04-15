@@ -24,6 +24,7 @@ import com.transitwidget.feed.model.Agency;
 import com.transitwidget.fragments.DirectionListFragment;
 import com.transitwidget.fragments.FavoritesFragment;
 import com.transitwidget.fragments.RouteListFragment;
+import com.transitwidget.fragments.StopFragment;
 import com.transitwidget.fragments.StopListFragment;
 import com.transitwidget.utils.AdapterUtils;
 
@@ -53,6 +54,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     // The routes tab
 	private String mRoute = null;
 	private String mDirection = null;
+	private String mStop = null;
 	
 	private ActionBar actionBar;
 	private FragmentManager mFragmentManager;
@@ -183,6 +185,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 		Log.i(TAG, "Route selected: " + routeTag);
 		mRoute = routeTag;
 		mDirection = null;
+		mStop = null;
 
     	Bundle args = new Bundle();
     	args.putString(DirectionListFragment.ARG_AGENCY_TAG, mAgency);
@@ -195,6 +198,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 	public void directionSelected(String tag) {
 		Log.i(TAG, "Direction selected: " + tag);
 		mDirection = tag;
+		mStop = null;
 
     	Bundle args = new Bundle();
     	args.putString(StopListFragment.ARG_AGENCY_TAG, mAgency);
@@ -205,6 +209,13 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 
 	public void stopSelected(String tag) {
 		Log.i(TAG, "Stop selected: " + tag);
+		mStop = tag;
+		
+    	Bundle args = new Bundle();
+    	args.putString(StopFragment.ARG_AGENCY_TAG, mAgency);
+    	args.putString(StopFragment.ARG_STOP_TAG, tag);
+    	Fragment fragment = Fragment.instantiate(this, StopFragment.class.getName(), args);
+    	loadFragment(fragment, true);
 	}
 	
 	/**
@@ -221,6 +232,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 			} else {
 				if (mRoute != null) text.append("Route ").append(mRoute);
 				if (mDirection != null) text.append(" / ").append(mDirection);
+				if (mStop != null) text.append(" / ").append(mStop);
 			}
 		} else if (mTag.equals(TAG_FAVORITES)) {
 			text.append("Select a Favorite");

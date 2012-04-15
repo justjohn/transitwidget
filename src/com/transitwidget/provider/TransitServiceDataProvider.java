@@ -2,6 +2,7 @@ package com.transitwidget.provider;
 
 import com.transitwidget.feed.model.Agency;
 import com.transitwidget.feed.model.Direction;
+import com.transitwidget.feed.model.Favorite;
 import com.transitwidget.feed.model.Route;
 import com.transitwidget.feed.model.Stop;
 
@@ -20,7 +21,7 @@ public class TransitServiceDataProvider extends ContentProvider {
     private static final String TAG = TransitServiceDataProvider.class.getName();
 	
     private static final String DATABASE_NAME = "transitServiceData.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
     public static final String AUTHORITY = "transitwidget.provider.TransitServiceDataProvider";
     
@@ -36,6 +37,9 @@ public class TransitServiceDataProvider extends ContentProvider {
 
     private static final int STOPS = 7;
     private static final int STOP_ID = 8;
+
+    private static final int FAVORITES = 9;
+    private static final int FAVORITE_ID = 10;
     
     private static final UriMatcher sUriMatcher;
 
@@ -55,6 +59,9 @@ public class TransitServiceDataProvider extends ContentProvider {
 
         sUriMatcher.addURI(AUTHORITY, Stop.TABLE_NAME, STOPS);
         sUriMatcher.addURI(AUTHORITY, Stop.TABLE_NAME + "/#", STOP_ID);
+
+        sUriMatcher.addURI(AUTHORITY, Favorite.TABLE_NAME, FAVORITES);
+        sUriMatcher.addURI(AUTHORITY, Favorite.TABLE_NAME + "/#", FAVORITE_ID);
     }
     
     @Override
@@ -70,44 +77,52 @@ public class TransitServiceDataProvider extends ContentProvider {
         SQLiteQueryBuilder qBuilder = new SQLiteQueryBuilder();
         
         int match = sUriMatcher.match(uri);
-        switch (match)
-        {
+        switch (match) {
 	        case AGENCIES:
 	            qBuilder.setTables(Agency.TABLE_NAME);
-	            
 	            break;
+	            
 	        case AGENCY_ID:
 	            qBuilder.setTables(Agency.TABLE_NAME);
 	            qBuilder.appendWhere(Agency._ID + " = " + uri.getLastPathSegment());
-	            
 	            break;
+	            
 	        case ROUTES:
 	            qBuilder.setTables(Route.TABLE_NAME);
-	            
 	            break;
+	            
 	        case ROUTE_ID:
 	            qBuilder.setTables(Route.TABLE_NAME);
 	            qBuilder.appendWhere(Route._ID + " = " + uri.getLastPathSegment());
-	            
 	            break;
+	            
 	        case DIRECTIONS:
 	            qBuilder.setTables(Direction.TABLE_NAME);
-	            
 	            break;
+	            
 	        case DIRECTION_ID:
 	            qBuilder.setTables(Direction.TABLE_NAME);
 	            qBuilder.appendWhere(Direction._ID + " = " + uri.getLastPathSegment());
-	            
 	            break;
+	            
 	        case STOPS:
 	            qBuilder.setTables(Stop.TABLE_NAME);
-	            
 	            break;
+	            
 	        case STOP_ID:
 	            qBuilder.setTables(Stop.TABLE_NAME);
 	            qBuilder.appendWhere(Stop._ID + " = " + uri.getLastPathSegment());
-	            
 	            break;
+	            
+	        case FAVORITES:
+	            qBuilder.setTables(Favorite.TABLE_NAME);
+	            break;
+	            
+	        case FAVORITE_ID:
+	            qBuilder.setTables(Favorite.TABLE_NAME);
+	            qBuilder.appendWhere(Favorite._ID + " = " + uri.getLastPathSegment());
+	            break;
+	            
             default:
                 throw new IllegalArgumentException("URI " + uri + " not recognized by widget configuration content provider.");
         }
@@ -148,6 +163,11 @@ public class TransitServiceDataProvider extends ContentProvider {
 	            return Stop.CONTENT_TYPE;
 	        case STOP_ID:
 	            return Stop.CONTENT_TYPE_ITEM;
+
+	        case FAVORITES:
+	            return Favorite.CONTENT_TYPE;
+	        case FAVORITE_ID:
+	            return Favorite.CONTENT_TYPE_ITEM;
 	            
             default:
                 return null;
@@ -179,6 +199,11 @@ public class TransitServiceDataProvider extends ContentProvider {
 	        case STOPS:
 	            table   = Stop.TABLE_NAME;
 	            baseUri = Stop.CONTENT_URI;
+                break;
+
+	        case FAVORITES:
+	            table   = Favorite.TABLE_NAME;
+	            baseUri = Favorite.CONTENT_URI;
                 break;
                 
             default:
@@ -213,7 +238,11 @@ public class TransitServiceDataProvider extends ContentProvider {
 	        case STOPS:
 	            table = Stop.TABLE_NAME;
 	            break;
-                
+
+	        case FAVORITES:
+	            table = Favorite.TABLE_NAME;
+	            break;
+	            
             default:
                 throw new IllegalArgumentException("URI " + uri + " cannot be deleted by widget configuration content provider.");
         }
@@ -245,6 +274,10 @@ public class TransitServiceDataProvider extends ContentProvider {
 	        case STOPS:
 	            table = Stop.TABLE_NAME;
 	            break;
+	            
+	        case FAVORITES:
+	            table = Favorite.TABLE_NAME;
+	            break;
                 
             default:
                 throw new IllegalArgumentException("URI " + uri + " cannot be deleted by widget configuration content provider.");
@@ -273,6 +306,7 @@ public class TransitServiceDataProvider extends ContentProvider {
 	    	Route.onCreate(db);
 	    	Direction.onCreate(db);
 	    	Stop.onCreate(db);
+	    	Favorite.onCreate(db);
 	    }
 	
 	    /**
@@ -287,6 +321,7 @@ public class TransitServiceDataProvider extends ContentProvider {
 			Route.onUpgrade(db, oldVersion, newVersion);
 			Direction.onUpgrade(db, oldVersion, newVersion);
 			Stop.onUpgrade(db, oldVersion, newVersion);
+			Favorite.onUpgrade(db, oldVersion, newVersion);
 	    }
 	}
 }
