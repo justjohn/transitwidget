@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.appwidget.AppWidgetManager;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,8 +15,10 @@ import android.view.View;
 import android.widget.*;
 import android.widget.AdapterView.OnItemSelectedListener;
 import com.transitwidget.adapters.BaseItemAdapter;
+import com.transitwidget.feed.model.Agency;
 import com.transitwidget.prefs.*;
 import com.transitwidget.service.AlarmSchedulerService;
+import com.transitwidget.utils.AdapterUtils;
 import com.transitwidget.utils.CalendarUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,14 +58,17 @@ public class WidgetConfigActivity extends Activity {
     
     private static void updateDisplay(TextView display, int hour, int minute) {
         StringBuilder build = new StringBuilder();
+        String ampm = "";
         if (hour < 12) {
             if (hour == 0) hour = 12;  // 0 => 12am
-            build.append(hour).append("am");
+            build.append(hour);
+            ampm = "am";
         } else {
             if (hour > 12) hour -= 12; // 13-23 => 1-11pm
-            build.append(hour).append("pm");
+            build.append(hour);
+            ampm = "pm";
         }
-        build.append(":").append(minute);
+        build.append(":").append(minute).append(ampm);
         display.setText(build.toString());
     }
     
@@ -134,7 +141,7 @@ public class WidgetConfigActivity extends Activity {
                 start.set(Calendar.MINUTE, startMinute);
                 start.set(Calendar.SECOND, 0);
                 int startTime = CalendarUtils.getTimeFromBeginingOfDay(start);
-                
+
                 Calendar end = Calendar.getInstance();
                 end.set(Calendar.HOUR_OF_DAY, endHour);
                 end.set(Calendar.MINUTE, endMinute);
@@ -143,7 +150,7 @@ public class WidgetConfigActivity extends Activity {
 
                 config.setStartObserving(startTime);
                 config.setStopObserving(endTime);
-    			
+
                 // When the button is clicked, save the string in our prefs and return that they
                 // clicked OK.
                 savePreferences(context, mAppWidgetId);
@@ -156,11 +163,11 @@ public class WidgetConfigActivity extends Activity {
                 resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
                 setResult(RESULT_OK, resultValue);
 
-    			Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
-    			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, mAppWidgetId);
-    			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, startTime);
-    			startService(serviceIntent);
-    			
+                Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
+                serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, mAppWidgetId);
+                serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, startTime);
+                startService(serviceIntent);
+
                 finish();
             }
         });
@@ -176,7 +183,7 @@ public class WidgetConfigActivity extends Activity {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             mAppWidgetId = extras.getInt(
-                    AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+            AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         }
 
         // If they gave us an intent without the widget id, just bail.
@@ -195,47 +202,60 @@ public class WidgetConfigActivity extends Activity {
         
         agencySpinner.setEnabled(false);
         agencySpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-    		public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long id) {
-    			Log.i(TAG, "Agency selected: " + id);
-    	        resetRouteSpinner();
-    	        resetDirectionSpinner();
-    	        resetStopSpinner();
-    			updateRoute();
-    		}
-    		public void onNothingSelected(AdapterView<?> arg0) {}
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long id) {
+                Log.i(TAG, "Agency selected: " + id);
+                resetRouteSpinner();
+                resetDirectionSpinner();
+                resetStopSpinner();
+                updateRoute();
+                
+                // Save selected id
+				Cursor cursor = getContentResolver().query(ContentUris.withAppendedId(Agency.CONTENT_URI, id), new String[] { Agency.TAG }, null, null, null);
+				String tag = null;
+				if (cursor.moveToFirst()) {
+					tag = cursor.getString(0);
+				}
+
+				Log.i(TAG, "Saving selected agency with id " + id + " and tag " + tag);
+				getSharedPreferences(MainActivity.PREFS, MODE_PRIVATE).edit()
+						.putLong("agency", id)
+						.putString("agencyTag", tag)
+					.commit();
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {}
         });
         
         routeSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-    		public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long id) {
-    			Log.i(TAG, "Route selected: " + id);
-    	        resetDirectionSpinner();
-    	        resetStopSpinner();
-    			updateDirection();
-    		}
-    		public void onNothingSelected(AdapterView<?> arg0) {}
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int pos, long id) {
+                Log.i(TAG, "Route selected: " + id);
+                resetDirectionSpinner();
+                resetStopSpinner();
+                updateDirection();
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {}
         });
      
         directionSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-    		public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-    	        resetStopSpinner();
-    			updateStop();
-    		}
-    		public void onNothingSelected(AdapterView<?> arg0) {}
+            public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+                resetStopSpinner();
+                updateStop();
+            }
+            public void onNothingSelected(AdapterView<?> arg0) {}
         });
         
         stopSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> arg0, View arg1,int arg2, long arg3) {
-		        saveButton.setEnabled(true);
-			}
+            public void onItemSelected(AdapterView<?> arg0, View arg1,int arg2, long arg3) {
+                saveButton.setEnabled(true);
+            }
 
-			public void onNothingSelected(AdapterView<?> arg0) {
-		        saveButton.setEnabled(false);
-			}
+            public void onNothingSelected(AdapterView<?> arg0) {
+                saveButton.setEnabled(false);
+            }
         });
         
         config = new NextBusObserverConfig(WidgetConfigActivity.this, mAppWidgetId);
         new UpdateAgencies().execute(config);
-
+        
         Log.i(TAG, "End OnCreate");
     }
 
@@ -311,6 +331,13 @@ public class WidgetConfigActivity extends Activity {
         protected void onPostExecute(List<NextBusAgency> result) {
         	agencyAdapter = createAdapter(result, agencySpinner);
         	agencySpinner.setEnabled(true);
+            
+            // Load previously selected agency from preferences
+	        long selectedAgency = getSharedPreferences(MainActivity.PREFS, MODE_PRIVATE).getLong("agency", -1);
+            if (selectedAgency >= 0) {
+	        	int position = AdapterUtils.getAdapterPositionById(agencySpinner.getAdapter(), selectedAgency);
+                agencySpinner.setSelection(position);
+            }
         }
     }
     

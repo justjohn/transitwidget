@@ -29,16 +29,16 @@ import com.transitwidget.fragments.StopListFragment;
 import com.transitwidget.utils.AdapterUtils;
 
 public class MainActivity extends SherlockFragmentActivity implements RouteListFragment.Listener, DirectionListFragment.Listener, StopListFragment.Listener, OnBackStackChangedListener {
-    private static final String PREFS = "prefs";
+    public static final String PREFS = "prefs";
 
-	private static final String TAG = MainActivity.class.getName();
+    private static final String TAG = MainActivity.class.getName();
 
-	private static final String STATE_TAG = "tag";
-	private static final String STATE_ROUTE = "route";
-	private static final String STATE_DIRECTION = "direction";
+    private static final String STATE_TAG = "tag";
+    private static final String STATE_ROUTE = "route";
+    private static final String STATE_DIRECTION = "direction";
 
-	private static final String TAG_ROUTES = "routes";
-	private static final String TAG_FAVORITES = "favorites";
+    private static final String TAG_ROUTES = "routes";
+    private static final String TAG_FAVORITES = "favorites";
 	
     private LoadAgencyTask loadAgencyTask = new LoadAgencyTask();
     
@@ -49,17 +49,17 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     /** The tab/fragment currently active (one of TAG_ROUTES/TAG_FAVORITES/etc...) */
     private String mTag = null;
     
-	private String mAgency = null;
+    private String mAgency = null;
 
     // The routes tab
-	private String mRoute = null;
-	private String mDirection = null;
-	private String mStop = null;
-	
-	private ActionBar actionBar;
-	private FragmentManager mFragmentManager;
-    
-	/** Called when the activity is first created. */
+    private String mRoute = null;
+    private String mDirection = null;
+    private String mStop = null;
+
+    private ActionBar actionBar;
+    private FragmentManager mFragmentManager;
+
+    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,9 +74,9 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
         
         // Check if anything has been saved...
         if (savedInstanceState != null) {
-	        mTag = savedInstanceState.getString(STATE_TAG);
-	        mRoute = savedInstanceState.getString(STATE_ROUTE);
-	        mDirection = savedInstanceState.getString(STATE_DIRECTION);
+            mTag = savedInstanceState.getString(STATE_TAG);
+            mRoute = savedInstanceState.getString(STATE_ROUTE);
+            mDirection = savedInstanceState.getString(STATE_DIRECTION);
         }
         
         // default to routes browser tab
