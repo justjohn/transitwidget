@@ -1,3 +1,7 @@
+.classpath
+.project
+.settings
+private
 /bin
 /gen
 local.properties
