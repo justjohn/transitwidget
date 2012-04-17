@@ -1,10 +1,8 @@
 package com.transitwidget;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -12,20 +10,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.*;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.Button;
-import android.widget.Spinner;
-
 import com.transitwidget.adapters.BaseItemAdapter;
-import com.transitwidget.prefs.NextBusAgency;
-import com.transitwidget.prefs.NextBusDirection;
-import com.transitwidget.prefs.NextBusObserverConfig;
-import com.transitwidget.prefs.NextBusRoute;
-import com.transitwidget.prefs.NextBusStop;
-import com.transitwidget.prefs.NextBusValue;
+import com.transitwidget.prefs.*;
 import com.transitwidget.service.AlarmSchedulerService;
 import com.transitwidget.utils.CalendarUtils;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * The configuration screen for the ExampleAppWidgetProvider widget sample.
@@ -35,30 +28,69 @@ public class WidgetConfigActivity extends Activity {
 
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
     
-    NoDefaultSpinner agencySpinner;
-    NoDefaultSpinner routeSpinner;
-    NoDefaultSpinner directionSpinner;
-    NoDefaultSpinner stopSpinner;
+    private NoDefaultSpinner agencySpinner;
+    private NoDefaultSpinner routeSpinner;
+    private NoDefaultSpinner directionSpinner;
+    private NoDefaultSpinner stopSpinner;
     
-    Button saveButton;
+    private Button saveButton;
     
-    BaseItemAdapter<? extends NextBusValue> routeAdapter;
-    BaseItemAdapter<? extends NextBusValue> agencyAdapter;
-    BaseItemAdapter<? extends NextBusValue> directionAdapter;
-    BaseItemAdapter<? extends NextBusValue> endPointAdapter;
-    NextBusObserverConfig config;
+    private TextView startTimeView;
+    private TextView endTimeView;
     
-    public WidgetConfigActivity() {
-        super();
+    private BaseItemAdapter<? extends NextBusValue> routeAdapter;
+    private BaseItemAdapter<? extends NextBusValue> agencyAdapter;
+    private BaseItemAdapter<? extends NextBusValue> directionAdapter;
+    private BaseItemAdapter<? extends NextBusValue> endPointAdapter;
+    private NextBusObserverConfig config;
+    
+    private int startHour;
+    private int startMinute;
+    private int endHour;
+    private int endMinute;
+    
+    static final int TIME_START_DIALOG_ID = 0;
+    static final int TIME_END_DIALOG_ID = 1;
+    
+    private static void updateDisplay(TextView display, int hour, int minute) {
+        StringBuilder build = new StringBuilder();
+        if (hour < 12) {
+            if (hour == 0) hour = 12;  // 0 => 12am
+            build.append(hour).append("am");
+        } else {
+            if (hour > 12) hour -= 12; // 13-23 => 1-11pm
+            build.append(hour).append("pm");
+        }
+        build.append(":").append(minute);
+        display.setText(build.toString());
+    }
+    
+    private void updateStartDisplay() {
+        updateDisplay(startTimeView, startHour, startMinute);
+    }
+    
+    private void updateEndDisplay() {
+        updateDisplay(endTimeView, endHour, endMinute);
     }
 
+    private static String pad(int c) {
+        if (c >= 10)
+            return String.valueOf(c);
+        else
+            return "0" + String.valueOf(c);
+    }
+    
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-    	// TODO Auto-generated method stub
-    	super.onSaveInstanceState(outState);
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case TIME_START_DIALOG_ID:
+                return new TimePickerDialog(this, mStartTimeSetListener, startHour, startMinute, false);
+            case TIME_END_DIALOG_ID:
+                return new TimePickerDialog(this, mEndTimeSetListener, endHour, endMinute, false);
+        }
+        return null;
     }
 
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +101,25 @@ public class WidgetConfigActivity extends Activity {
 
         // Set the view layout resource to use.
         setContentView(R.layout.widget_config);
+        
+        startTimeView = (TextView) findViewById(R.id.startTimePickerValue);
+        endTimeView = (TextView) findViewById(R.id.endTimePickerValue);
+        
+        Calendar cal = Calendar.getInstance();
+        startHour = endHour = cal.get(Calendar.HOUR_OF_DAY);
+        startMinute = endMinute = cal.get(Calendar.MINUTE);
+        
+        findViewById(R.id.startTimePicker).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showDialog(TIME_START_DIALOG_ID);
+            }
+        });
+        
+        findViewById(R.id.endTimePicker).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showDialog(TIME_END_DIALOG_ID);
+            }
+        });
 
         // Bind the action for the save button.
         saveButton = (Button) findViewById(R.id.saveBtn);
@@ -78,13 +129,20 @@ public class WidgetConfigActivity extends Activity {
                 final Context context = WidgetConfigActivity.this;
 
                 // Until there are UI selectors, we'll start in 5 seconds and run for 10 minutes.
-    			Calendar cal = Calendar.getInstance();
-    			cal.add(Calendar.SECOND, 5); // start 5 seconds from now
-    			int trigger_time = CalendarUtils.getTimeFromBeginingOfDay(cal);
-    			int end_time = trigger_time + 600; // 10 minutes
-    			
-    			config.setStartObserving(trigger_time);
-    			config.setStopObserving(end_time);
+                Calendar start = Calendar.getInstance();
+                start.set(Calendar.HOUR_OF_DAY, startHour);
+                start.set(Calendar.MINUTE, startMinute);
+                start.set(Calendar.SECOND, 0);
+                int startTime = CalendarUtils.getTimeFromBeginingOfDay(start);
+                
+                Calendar end = Calendar.getInstance();
+                end.set(Calendar.HOUR_OF_DAY, endHour);
+                end.set(Calendar.MINUTE, endMinute);
+                end.set(Calendar.SECOND, 0);
+                int endTime = CalendarUtils.getTimeFromBeginingOfDay(end);
+
+                config.setStartObserving(startTime);
+                config.setStopObserving(endTime);
     			
                 // When the button is clicked, save the string in our prefs and return that they
                 // clicked OK.
@@ -100,7 +158,7 @@ public class WidgetConfigActivity extends Activity {
 
     			Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
     			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, mAppWidgetId);
-    			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, trigger_time);
+    			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, startTime);
     			startService(serviceIntent);
     			
                 finish();
@@ -292,4 +350,24 @@ public class WidgetConfigActivity extends Activity {
             saveButton.setEnabled(false);
         }
     }
+    
+    // the callback received when the user "sets" the time in the dialog
+    private TimePickerDialog.OnTimeSetListener mStartTimeSetListener =
+        new TimePickerDialog.OnTimeSetListener() {
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                startHour = hourOfDay;
+                startMinute = minute;
+                updateStartDisplay();
+            }
+        };
+    
+    // the callback received when the user "sets" the time in the dialog
+    private TimePickerDialog.OnTimeSetListener mEndTimeSetListener =
+        new TimePickerDialog.OnTimeSetListener() {
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                endHour = hourOfDay;
+                endMinute = minute;
+                updateEndDisplay();
+            }
+        };
 }

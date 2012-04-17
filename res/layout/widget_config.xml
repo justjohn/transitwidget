@@ -29,70 +29,123 @@
         
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <ScrollView
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_above="@id/button_bar"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
         
-        <TextView
-            android:id="@+id/agencyLabel"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/agencyLabel"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_height="wrap_content" >
 
-        <com.transitwidget.NoDefaultSpinner
-            android:prompt="@string/spinnerLabel"
-            android:id="@+id/agencySpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="55dp" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/agencyLabel"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
-            android:id="@+id/routeLabel"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="@string/routeLabel"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            <com.transitwidget.NoDefaultSpinner
+                android:prompt="@string/spinnerLabel"
+                android:id="@+id/agencySpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="55dp" />
 
-        <com.transitwidget.NoDefaultSpinner
-            android:prompt="@string/spinnerLabel"
-            android:id="@+id/routeSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="55dp" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="@string/routeLabel"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    	<TextView
-            android:id="@+id/directionLabel"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="21dp"
-            android:text="@string/directionLabel"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-        
-    	<com.transitwidget.NoDefaultSpinner
-            android:prompt="@string/spinnerLabel"
-            android:id="@+id/directionSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="55dp" />
-    	
-        <TextView
-            android:id="@+id/endPointLabel"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/endPointLabel"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            <com.transitwidget.NoDefaultSpinner
+                android:prompt="@string/spinnerLabel"
+                android:id="@+id/routeSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="55dp" />
 
-        <com.transitwidget.NoDefaultSpinner
-            android:prompt="@string/spinnerLabel"
-            android:id="@+id/endPointSpinner"
-            android:layout_width="fill_parent"
-            android:layout_height="55dp" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="21dp"
+                android:text="@string/directionLabel"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    </LinearLayout>
+            <com.transitwidget.NoDefaultSpinner
+                android:prompt="@string/spinnerLabel"
+                android:id="@+id/directionSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="55dp" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/endPointLabel"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <com.transitwidget.NoDefaultSpinner
+                android:prompt="@string/spinnerLabel"
+                android:id="@+id/endPointSpinner"
+                android:layout_width="fill_parent"
+                android:layout_height="55dp" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@string/timesDescription"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/startTimeLabel"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/startTimePicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Start Time" />
+
+                <TextView
+                    android:id="@+id/startTimePickerValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Not Selected"  />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/endTimeLabel"
+                
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/endTimePicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="End Time"  />
+
+                <TextView
+                    android:id="@+id/endTimePickerValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Not Selected" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>
-
-
