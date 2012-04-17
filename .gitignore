@@ -1,3 +1,11 @@
 /bin
 /gen
 local.properties
+/deps/HoloEverywhereLib/.settings/
+/deps/HoloEverywhereLib/bin/
+/deps/HoloEverywhereLib/gen/
+/deps/HoloEverywhereLib/local.properties
+/deps/ActionBarSherlockLib/.settings/
+/deps/ActionBarSherlockLib/bin/
+/deps/ActionBarSherlockLib/gen/
+/deps/ActionBarSherlockLib/local.properties
