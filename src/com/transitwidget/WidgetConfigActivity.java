@@ -61,14 +61,14 @@ public class WidgetConfigActivity extends Activity {
         String ampm = "";
         if (hour < 12) {
             if (hour == 0) hour = 12;  // 0 => 12am
-            build.append(hour);
             ampm = "am";
         } else {
             if (hour > 12) hour -= 12; // 13-23 => 1-11pm
-            build.append(hour);
             ampm = "pm";
         }
-        build.append(":").append(minute).append(ampm);
+        build.append(hour).append(":");
+        if (minute < 10) build.append("0");
+        build.append(minute).append(ampm);
         display.setText(build.toString());
     }
     

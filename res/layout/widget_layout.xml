@@ -1,33 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:id="@+id/layout"
+    android:id="@+id/widget_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_margin="0dip"
     android:background="@drawable/appwidget_dark_bg_clickable" >
 
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_height="fill_parent"
+        android:layout_width="90dp"
+        android:gravity="center">
+        
     <TextView
         android:id="@+id/next_time"
         style="@android:style/TextAppearance.Medium"
-        android:layout_width="80dp"
-        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="center_horizontal|center_vertical"
+        android:gravity="center"
         android:layout_margin="4dip"
         android:textSize="20dp"
         android:text="00" />
-    
+        
+        
     <TextView
-        android:id="@+id/update"
+        android:id="@+id/last_updated"
+        style="@android:style/TextAppearance.Small"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_margin="4dip"
+        android:textSize="12dp"
+        android:text="Infinity" />
+            
+    </LinearLayout>
+    
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:gravity="center">
+        
+    <TextView
+        android:id="@+id/route"
         style="@android:style/TextAppearance.Medium"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_gravity="center"
-        android:gravity="center_horizontal|center_vertical"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="4dip"
+        android:textSize="17dp"
+        android:text="Loading" />
+    <TextView
+        android:id="@+id/stop"
+        style="@android:style/TextAppearance.Medium"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
         android:layout_margin="4dip"
         android:textSize="13dp"
-        android:lines="3"
-        android:text="Loading..." />
+        android:lines="2"
+        android:text="..." />
+            
+    </LinearLayout>
 
 </LinearLayout>
