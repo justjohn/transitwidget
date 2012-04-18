@@ -24,7 +24,7 @@
     <string name="startTimeLabel">Select Time to Start Updating</string>
     <string name="endTimeLabel">Select Time to Finish Updating</string>
     
-    <string name="timesDescription">To conserve battery life, TransitWidget only updates every 5 minutes between the start and end time. You can always tap to immediately update.</string>
+    <string name="timesDescription">To conserve battery life, TransitWidget only updates every 30 seconds between the start and end time. You can always tap to immediately update.</string>
 
     <string name="spinnerLabel">Unspecified</string>
     <string name="which_bus_preferences">Which Bus?</string>
