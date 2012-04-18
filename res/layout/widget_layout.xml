@@ -4,8 +4,8 @@
     android:id="@+id/layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:layout_margin="8dip"
-    android:background="@drawable/widget_background" >
+    android:layout_margin="0dip"
+    android:background="@drawable/appwidget_dark_bg_clickable" >
 
     <TextView
         android:id="@+id/next_time"
