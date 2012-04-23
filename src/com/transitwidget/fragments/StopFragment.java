@@ -130,9 +130,11 @@ public class StopFragment extends Fragment {
     
     class UpdateRunnable implements Runnable {
         public void run() {
-            new UpdateTask().execute("");
-            
-            // mHandler.postDelayed(new UpdateRunnable(), 30000);
+            // stop updating if this fragment is no longer visible
+            if (isVisible()) {
+                new UpdateTask().execute("");
+                mHandler.postDelayed(new UpdateRunnable(), 20000);
+            }
         }
     }
     

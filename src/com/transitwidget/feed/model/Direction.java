@@ -60,7 +60,6 @@ public class Direction {
 	private void fillStops(String[] stopTags, Context context) {
 		// Get the stop from the database
 		String selection = Stop.AGENCY + " = ? AND " + Stop.TAG + " IN (" + StringUtils.join(stopTags, ",", "\"") + ")";
-		Log.i(TAG, "Loadind stops: " + selection);
 		String[] selectionArgs = { agency };
 		Cursor cursor = context.getContentResolver().query(Stop.CONTENT_URI, null, selection, selectionArgs, null);
 		

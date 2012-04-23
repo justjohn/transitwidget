@@ -35,6 +35,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 
     private static final String STATE_TAG = "tag";
     private static final String STATE_ROUTE = "route";
+    private static final String STATE_STOP = "stop";
     private static final String STATE_DIRECTION = "direction";
     private static final String STATE_DIRECTION_TITLE = "directionTitle";
 
@@ -61,6 +62,9 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 
     private ActionBar actionBar;
     private FragmentManager mFragmentManager;
+    
+    /** Flag to ignore the first selection event on the agency spinner. */
+    private boolean mFirstRun = false;
 
     /** Called when the activity is first created. */
     @Override
@@ -72,8 +76,10 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
         mFragmentManager.addOnBackStackChangedListener(this);
         
         breadcrumbs = (TextView) findViewById(R.id.breadcrumbs);
+        agencySpinner = (NoDefaultSpinner) findViewById(R.id.agencySpinner);
         
         mAgency = getSharedPreferences(PREFS, MODE_PRIVATE).getString("agencyTag", null);
+        if (mAgency == null) mFirstRun = true;
         
         // Check if anything has been saved...
         if (savedInstanceState != null) {
@@ -81,6 +87,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
             mRoute = savedInstanceState.getString(STATE_ROUTE);
             mDirection = savedInstanceState.getString(STATE_DIRECTION);
             mDirectionTitle = savedInstanceState.getString(STATE_DIRECTION_TITLE);
+            mStop = savedInstanceState.getString(STATE_STOP);
         }
         
         // default to routes browser tab
@@ -97,7 +104,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 			public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
 				// load fragment
 		    	mTag = TAG_ROUTES;
-				loadBasedOnPrefs();
+                loadSelected();
 			}
 		}));
         actionBar.addTab(actionBar.newTab()
@@ -113,46 +120,52 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 			}
 		}));
         
-        agencySpinner = (NoDefaultSpinner) findViewById(R.id.agencySpinner);
         agencySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
-				Cursor cursor = getContentResolver().query(ContentUris.withAppendedId(Agency.CONTENT_URI, id), new String[] { Agency.TAG }, null, null, null);
-				String tag = null;
-				if (cursor.moveToFirst()) {
-					tag = cursor.getString(0);
-				}
+            public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+                if (mFirstRun) {
+                    Cursor cursor = getContentResolver().query(ContentUris.withAppendedId(Agency.CONTENT_URI, id), new String[] { Agency.TAG }, null, null, null);
+                    String tag = null;
+                    if (cursor.moveToFirst()) {
+                        tag = cursor.getString(0);
+                    }
+                    cursor.close();
 
-				Log.i(TAG, "Saving selected agency with id " + id + " and tag " + tag);
-				getSharedPreferences(PREFS, MODE_PRIVATE).edit()
-						.putLong("agency", id)
-						.putString("agencyTag", tag)
-					.commit();
-				
-				if (tag != null) {
-					mAgency = tag;
-					loadRouteList();
-				}
-			}
+                    Log.i(TAG, "Saving selected agency with id " + id + " and tag " + tag);
+                    getSharedPreferences(PREFS, MODE_PRIVATE).edit()
+                            .putLong("agency", id)
+                            .putString("agencyTag", tag)
+                        .commit();
 
-			public void onNothingSelected(AdapterView<?> arg0) {}
-		});        
-        loadAgencyTask.execute("");
+                    if (tag != null) {
+                        mAgency = tag;
+                        agencySelected();
+                    }
+                }
+                mFirstRun = true;
+            }
+
+            public void onNothingSelected(AdapterView<?> arg0) {}
+        });
+        
+        loadAgencyTask.execute();
+        // calls agenciesLoaded() on complete
     }
     
-    private void loadBasedOnPrefs() {
-    	
-    	if (mTag.equals(TAG_ROUTES)) {
-	        if (mDirection != null) {
-	        	directionSelected(mDirection);
-	        } else if (mRoute != null) {
-	        	routeSelected(mRoute);
-	        } else if (mAgency != null) {
-	        	loadRouteList();
-	        }
-    	} else if (mTag.equals(TAG_FAVORITES)) {
-    		// favorites
-    		loadFavorites();
-    	}
+    /**
+     * Reset after a configuration change.
+     */
+    private void loadSelected() {
+        Log.i(TAG, "loadSelected -> Stop: " + mStop + ", Direction: " + mDirection + ", Route: " + mRoute + ", Agency: " + mAgency);
+        
+        if (mStop != null) {
+            stopSelected(mStop);
+        } else if (mDirection != null) {
+            directionSelected(mDirection);
+        } else if (mRoute != null) {
+            routeSelected(mRoute);
+        } else if (mAgency != null) {
+            agencySelected();
+        }
     }
     
     private void loadFavorites() {
@@ -177,9 +190,10 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     	outState.putString(STATE_DIRECTION, mDirection);
     	outState.putString(STATE_DIRECTION_TITLE, mDirectionTitle);
     	outState.putString(STATE_ROUTE, mRoute);
+    	outState.putString(STATE_STOP, mStop);
     }
     
-    public void loadRouteList() {
+    public void agencySelected() {
     	Bundle args = new Bundle();
     	args.putString(RouteListFragment.ARG_AGENCY_TAG, mAgency);
     	Fragment fragment = Fragment.instantiate(this, RouteListFragment.class.getName(), args);
@@ -325,7 +339,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 			Log.i(TAG, "get selected agency with id " + selectedAgency);
 	        
 	        startManagingCursor(cursor);
-	        agencyAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.single_list_item, cursor, new String[] {Agency.TITLE}, new int[] {R.id.value});
+	        agencyAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.single_list_item, cursor, new String[] {Agency.TITLE}, new int[] {R.id.value}, 0);
 	        agencySpinner.setAdapter(agencyAdapter);
 	        
 	        int position = 0;
