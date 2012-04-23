@@ -11,7 +11,7 @@
         android:padding="10dp"
         android:gravity="center"
         style="@android:style/TextAppearance.Medium" />
-    
+        
     <LinearLayout
         android:orientation="vertical"
         android:layout_height="wrap_content"
@@ -20,18 +20,17 @@
 
         <TextView
             android:id="@+id/next_time"
-            style="@android:style/TextAppearance.Large"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
             android:layout_margin="4dip"
             android:textSize="20dp"
+            android:textStyle="bold"
             android:text="--" />
 
         <TextView
             android:id="@+id/absolute_time"
-            style="@android:style/TextAppearance.Small"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -41,5 +40,28 @@
             android:text="" />
 
     </LinearLayout>
+    
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:text="@string/morePredictions"
+        android:paddingTop="5dp"
+        android:paddingBottom="2dp"
+        android:paddingLeft="10dp"
+        style="@android:style/TextAppearance.Medium" />
+    
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:background="#ff33b5e5"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"/>
+        
+    <ListView
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:id="@+id/more_predictions" />
 
 </LinearLayout>

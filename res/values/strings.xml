@@ -10,6 +10,8 @@
     <string name="startPointLabel">Start</string>
     <string name="endPointLabel">Stop</string>
     
+    <string name="morePredictions">Future Predictions</string>
+    
     <string-array name="default_spinner">
         <item >Unspecified</item>
     </string-array>

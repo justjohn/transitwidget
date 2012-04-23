@@ -9,20 +9,20 @@
         android:id="@+id/agencySpinner"
         android:layout_width="fill_parent"
         android:layout_height="55dp" />
-        
+    
     <TextView 
-        android:layout_below="@id/agencySpinner"
         android:id="@+id/breadcrumbs"
+        android:layout_alignParentBottom="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="10dp" 
-        android:background="#333"
+        android:background="#001"
         android:textStyle="bold" />
-    
+        
     <FrameLayout
         android:id="@+id/main_fragment_container"
-        android:layout_below="@id/breadcrumbs"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@id/agencySpinner"
+        android:layout_above="@id/breadcrumbs"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
          />
