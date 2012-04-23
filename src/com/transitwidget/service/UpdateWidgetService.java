@@ -7,11 +7,10 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.RemoteViews;
-
 import com.transitwidget.R;
 import com.transitwidget.prefs.NextBusObserverConfig;
+import com.transitwidget.utils.TimeUtils;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 public class UpdateWidgetService extends Service {
@@ -32,8 +31,8 @@ public class UpdateWidgetService extends Service {
 
 			String routeInfo;
 			String stopInfo = "";
-			String nextTime = "--";
-            String lastUpdated = "";
+			String relativeTime = "--";
+            String absoluteTime = "";
 			
 			NextBusObserverConfig prefs = new NextBusObserverConfig(getApplicationContext(), widgetId);
 			if (prefs.getRoute() == null) {
@@ -41,26 +40,13 @@ public class UpdateWidgetService extends Service {
 				routeInfo = "No data.";
 				
 			} else {
-			
-				long now = System.currentTimeMillis();
-                
-                lastUpdated = new SimpleDateFormat("M/d h:ma").format(new Date());
-	
 				String route = prefs.getRoute().getLongLabel();
 				String stop = prefs.getStop().getLongLabel();
 				String direction = prefs.getDirection().getShortLabel();
 				
 				long nextTimeMs = intent.getLongExtra(EXTRA_NEXT_TIME, -1);
-				if (nextTimeMs <= 0) {
-					// No prediction time
-					nextTime = "No Data";
-					
-				} else {
-					long seconds = (nextTimeMs - now) / 1000;
-					long minutes = seconds / 60;
-					seconds -= minutes * 60;
-					nextTime = minutes + "m " + seconds + "s";
-				}
+                relativeTime = TimeUtils.formatTimeOfNextBus(nextTimeMs);
+                absoluteTime = TimeUtils.formatAbsoluteTimeOfNextBus(nextTimeMs);
 	
 				if (direction == null) direction = "";
 				if (stop == null) stop = "";
@@ -73,8 +59,8 @@ public class UpdateWidgetService extends Service {
 			// Set the text
 			remoteViews.setTextViewText(R.id.route, routeInfo);
 			remoteViews.setTextViewText(R.id.stop, stopInfo);
-			remoteViews.setTextViewText(R.id.next_time, nextTime);
-			remoteViews.setTextViewText(R.id.last_updated, lastUpdated);
+			remoteViews.setTextViewText(R.id.next_time, relativeTime);
+			remoteViews.setTextViewText(R.id.absolute_time, absoluteTime);
 
 			// Register an onClickListener to refresh the widget
 			Intent clickIntent = new Intent(this.getApplicationContext(), MBTABackgroundService.class);

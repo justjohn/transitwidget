@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.text.format.DateFormat;
 import android.util.Log;
 
-import com.transitwidget.utils.CalendarUtils;
+import com.transitwidget.utils.TimeUtils;
 
 public class AlarmSchedulerService extends IntentService {
 	private static final String TAG = AlarmSchedulerService.class.getName();
@@ -33,7 +33,7 @@ public class AlarmSchedulerService extends IntentService {
 		int secondsSinceMidnight = intent.getIntExtra(EXTRA_DAY_START_TIME, -1);
 		
 		// Determine the time today of the seconds since midnight.
-		Calendar cal = CalendarUtils.getCalendarWithTimeFromMidnight(secondsSinceMidnight);
+		Calendar cal = TimeUtils.getCalendarWithTimeFromMidnight(secondsSinceMidnight);
 		
 		if (cal.before(Calendar.getInstance())) {
 			// The time has already passed today

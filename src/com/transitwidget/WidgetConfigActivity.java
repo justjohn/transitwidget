@@ -12,14 +12,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import com.transitwidget.adapters.BaseItemAdapter;
 import com.transitwidget.feed.model.Agency;
 import com.transitwidget.prefs.*;
 import com.transitwidget.service.AlarmSchedulerService;
 import com.transitwidget.utils.AdapterUtils;
-import com.transitwidget.utils.CalendarUtils;
+import com.transitwidget.utils.TimeUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -140,13 +144,13 @@ public class WidgetConfigActivity extends Activity {
                 start.set(Calendar.HOUR_OF_DAY, startHour);
                 start.set(Calendar.MINUTE, startMinute);
                 start.set(Calendar.SECOND, 0);
-                int startTime = CalendarUtils.getTimeFromBeginingOfDay(start);
+                int startTime = TimeUtils.getTimeFromBeginingOfDay(start);
 
                 Calendar end = Calendar.getInstance();
                 end.set(Calendar.HOUR_OF_DAY, endHour);
                 end.set(Calendar.MINUTE, endMinute);
                 end.set(Calendar.SECOND, 0);
-                int endTime = CalendarUtils.getTimeFromBeginingOfDay(end);
+                int endTime = TimeUtils.getTimeFromBeginingOfDay(end);
 
                 config.setStartObserving(startTime);
                 config.setStopObserving(endTime);

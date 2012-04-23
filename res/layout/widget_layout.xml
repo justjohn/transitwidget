@@ -13,57 +13,54 @@
         android:layout_width="90dp"
         android:gravity="center">
         
-    <TextView
-        android:id="@+id/next_time"
-        style="@android:style/TextAppearance.Medium"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_margin="4dip"
-        android:textSize="20dp"
-        android:text="00" />
-        
-        
-    <TextView
-        android:id="@+id/last_updated"
-        style="@android:style/TextAppearance.Small"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:layout_margin="4dip"
-        android:textSize="12dp"
-        android:text="Infinity" />
-            
+        <TextView
+            android:id="@+id/next_time"
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_margin="4dip"
+            android:textSize="20dp"
+            android:text="--" />
+
+        <TextView
+            android:id="@+id/absolute_time"
+            style="@android:style/TextAppearance.Small"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_margin="4dip"
+            android:textSize="12dp"
+            android:text="" />
+
     </LinearLayout>
-    
     <LinearLayout
         android:orientation="vertical"
         android:layout_height="fill_parent"
         android:layout_width="fill_parent"
         android:gravity="center">
         
-    <TextView
-        android:id="@+id/route"
-        style="@android:style/TextAppearance.Medium"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="4dip"
-        android:textSize="17dp"
-        android:text="Loading" />
-    <TextView
-        android:id="@+id/stop"
-        style="@android:style/TextAppearance.Medium"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="4dip"
-        android:textSize="13dp"
-        android:lines="2"
-        android:text="..." />
-            
-    </LinearLayout>
+        <TextView
+            android:id="@+id/route"
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_margin="4dip"
+            android:textSize="17dp"
+            android:text="Loading" />
+        <TextView
+            android:id="@+id/stop"
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_margin="4dip"
+            android:textSize="13dp"
+            android:lines="2"
+            android:text="..." />
 
+    </LinearLayout>
 </LinearLayout>

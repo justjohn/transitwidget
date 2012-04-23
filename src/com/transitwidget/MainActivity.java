@@ -14,13 +14,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.ActionBar.TabListener;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.transitwidget.api.ServiceProvider;
 import com.transitwidget.feed.model.Agency;
+import com.transitwidget.feed.model.Direction;
 import com.transitwidget.fragments.DirectionListFragment;
 import com.transitwidget.fragments.FavoritesFragment;
 import com.transitwidget.fragments.RouteListFragment;
@@ -36,6 +36,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     private static final String STATE_TAG = "tag";
     private static final String STATE_ROUTE = "route";
     private static final String STATE_DIRECTION = "direction";
+    private static final String STATE_DIRECTION_TITLE = "directionTitle";
 
     private static final String TAG_ROUTES = "routes";
     private static final String TAG_FAVORITES = "favorites";
@@ -54,6 +55,8 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     // The routes tab
     private String mRoute = null;
     private String mDirection = null;
+    /** Short name of direction. */
+    private String mDirectionTitle = null;
     private String mStop = null;
 
     private ActionBar actionBar;
@@ -77,6 +80,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
             mTag = savedInstanceState.getString(STATE_TAG);
             mRoute = savedInstanceState.getString(STATE_ROUTE);
             mDirection = savedInstanceState.getString(STATE_DIRECTION);
+            mDirectionTitle = savedInstanceState.getString(STATE_DIRECTION_TITLE);
         }
         
         // default to routes browser tab
@@ -171,6 +175,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 
     	outState.putString(STATE_TAG, mTag);
     	outState.putString(STATE_DIRECTION, mDirection);
+    	outState.putString(STATE_DIRECTION_TITLE, mDirectionTitle);
     	outState.putString(STATE_ROUTE, mRoute);
     }
     
@@ -185,6 +190,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 		Log.i(TAG, "Route selected: " + routeTag);
 		mRoute = routeTag;
 		mDirection = null;
+        mDirectionTitle = null;
 		mStop = null;
 
     	Bundle args = new Bundle();
@@ -199,6 +205,18 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 		Log.i(TAG, "Direction selected: " + tag);
 		mDirection = tag;
 		mStop = null;
+        
+        // Lookup title for direction
+        String selection = Direction.AGENCY + " = ? AND " + Direction.ROUTE + " = ? AND " + Direction.TAG + " = ?";
+        String[] selectionArgs = { mAgency, mRoute, mDirection };
+        Cursor c = getContentResolver().query(Direction.CONTENT_URI, null, selection, selectionArgs, null);
+        if (c.moveToFirst()) {
+            mDirectionTitle = new Direction(c, this).getTitle();
+        } else {
+            Log.e(TAG, "Unable to lookup direction with tag " + mDirection);
+            mDirectionTitle = mDirection;
+        }
+        c.close();
 
     	Bundle args = new Bundle();
     	args.putString(StopListFragment.ARG_AGENCY_TAG, mAgency);
@@ -213,26 +231,28 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 		
     	Bundle args = new Bundle();
     	args.putString(StopFragment.ARG_AGENCY_TAG, mAgency);
-    	args.putString(StopFragment.ARG_STOP_TAG, tag);
+    	args.putString(StopFragment.ARG_ROUTE_TAG, mRoute);
+    	args.putString(StopFragment.ARG_DIRECTION_TAG, mDirection);
+    	args.putString(StopFragment.ARG_STOP_TAG, mStop);
     	Fragment fragment = Fragment.instantiate(this, StopFragment.class.getName(), args);
     	loadFragment(fragment, true);
 	}
 	
 	/**
-	 * Builds a breadcrumb based on the currently selected tab/route/direction.
+	 * Builds a bread crumb based on the currently selected tab/route/direction.
 	 * 
 	 * @param backStackEmpty Is the back stack empty (that is, are we at the root of the view tree.)
-	 * @return The breadcrumb text.
+	 * @return The bread crumb text.
 	 */
 	private String buildBreadCrumb(boolean backStackEmpty) {
 		StringBuilder text = new StringBuilder();
 		if (mTag.equals(TAG_ROUTES)) {
 			if (backStackEmpty) {
 				text.append("Select a Route");
+                
 			} else {
 				if (mRoute != null) text.append("Route ").append(mRoute);
-				if (mDirection != null) text.append(" / ").append(mDirection);
-				if (mStop != null) text.append(" / ").append(mStop);
+				if (mDirectionTitle != null) text.append(" / ").append(mDirectionTitle);
 			}
 		} else if (mTag.equals(TAG_FAVORITES)) {
 			text.append("Select a Favorite");
@@ -282,6 +302,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 
     private class LoadAgencyTask extends AsyncTask<String, Integer, Cursor> {
 		public ProgressDialog dialog;
+        @Override
 		protected void onPreExecute() {
 			dialog = ProgressDialog.show(MainActivity.this, "", "Loading Transit Agencies. Please wait...", true);
 		}
@@ -297,6 +318,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 	    	
 	    	return cursor;
 		}
+        @Override
 		protected void onPostExecute(Cursor cursor) {
 	    	dialog.dismiss();
 	        long selectedAgency = getSharedPreferences(PREFS, MODE_PRIVATE).getLong("agency", -1);

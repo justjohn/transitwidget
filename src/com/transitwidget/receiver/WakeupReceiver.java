@@ -3,7 +3,7 @@ package com.transitwidget.receiver;
 import com.transitwidget.PredictionWidgetProvider;
 import com.transitwidget.prefs.NextBusObserverConfig;
 import com.transitwidget.service.AlarmSchedulerService;
-import com.transitwidget.utils.CalendarUtils;
+import com.transitwidget.utils.TimeUtils;
 
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
@@ -26,7 +26,7 @@ public class WakeupReceiver extends BroadcastReceiver {
 		
 		for (int widgetId : widgetIds) {
 			NextBusObserverConfig config = new NextBusObserverConfig(ctx, widgetId);
-			Log.i(TAG, "Reset alarm for widget " + widgetId + " to " + DateFormat.format("h:mmaa", CalendarUtils.getCalendarWithTimeFromMidnight(config.getStartObserving())));
+			Log.i(TAG, "Reset alarm for widget " + widgetId + " to " + DateFormat.format("h:mmaa", TimeUtils.getCalendarWithTimeFromMidnight(config.getStartObserving())));
 
 			Intent serviceIntent = new Intent(ctx, AlarmSchedulerService.class);
 			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, widgetId);

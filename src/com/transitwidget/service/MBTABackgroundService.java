@@ -10,7 +10,7 @@ import java.util.List;
 import com.transitwidget.api.NextBusAPI;
 import com.transitwidget.feed.model.BusPrediction;
 import com.transitwidget.prefs.NextBusObserverConfig;
-import com.transitwidget.utils.CalendarUtils;
+import com.transitwidget.utils.TimeUtils;
 
 
 import android.app.AlarmManager;
@@ -73,7 +73,7 @@ public class MBTABackgroundService extends IntentService {
 			return;
 		}
 
-		Calendar endTime = CalendarUtils.getCalendarWithTimeFromMidnight(config.getStopObserving());
+		Calendar endTime = TimeUtils.getCalendarWithTimeFromMidnight(config.getStopObserving());
 		// Calendar startTime = CalendarUtils.getCalendarWithTimeFromMidnight(config.getStartObserving());
 		String agency = config.getAgency().getTag();
 		String routeTag = config.getRoute().getTag();
