@@ -4,16 +4,15 @@ import android.app.Activity;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.transitwidget.R;
 import com.transitwidget.feed.model.Favorite;
 import com.transitwidget.fragments.StopListFragment.Listener;
 
-public class FavoritesFragment extends ListFragment {
+public class FavoritesFragment extends SherlockListFragment {
     public static final String ARG_AGENCY_TAG = "agencyTag";
 
 	private SimpleCursorAdapter mAdapter;
@@ -25,8 +24,8 @@ public class FavoritesFragment extends ListFragment {
     	
     	mListener = (Listener)getActivity();
     	
-        String[] from = {Favorite.STOP_LABEL, Favorite.ROUTE_LABEL};
-        int[] to = {R.id.stop, R.id.route};
+        String[] from = {Favorite.STOP_LABEL, Favorite.ROUTE, Favorite.DIRECTION};
+        int[] to = {R.id.stop, R.id.route, R.id.direction};
         
         mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.favorite_list_item, null, from, to);
         setListAdapter(mAdapter);

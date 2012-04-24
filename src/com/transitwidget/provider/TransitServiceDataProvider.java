@@ -1,11 +1,5 @@
 package com.transitwidget.provider;
 
-import com.transitwidget.feed.model.Agency;
-import com.transitwidget.feed.model.Direction;
-import com.transitwidget.feed.model.Favorite;
-import com.transitwidget.feed.model.Route;
-import com.transitwidget.feed.model.Stop;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,13 +9,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.util.Log;
+import com.transitwidget.feed.model.Agency;
+import com.transitwidget.feed.model.Direction;
+import com.transitwidget.feed.model.Favorite;
+import com.transitwidget.feed.model.Route;
+import com.transitwidget.feed.model.Stop;
 
 public class TransitServiceDataProvider extends ContentProvider {
     private static final String TAG = TransitServiceDataProvider.class.getName();
 	
     private static final String DATABASE_NAME = "transitServiceData.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
     public static final String AUTHORITY = "transitwidget.provider.TransitServiceDataProvider";
     
@@ -259,28 +259,39 @@ public class TransitServiceDataProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match)
         {
+            case AGENCY_ID:
+                selection = BaseColumns._ID + " = " + uri.getLastPathSegment();
 	        case AGENCIES:
 	            table = Agency.TABLE_NAME;
 	            break;
 	            
+            case ROUTE_ID:
+                selection = BaseColumns._ID + " = " + uri.getLastPathSegment();
 	        case ROUTES:
 	            table = Route.TABLE_NAME;
 	            break;
 	            
+            case DIRECTION_ID:
+                selection = BaseColumns._ID + " = " + uri.getLastPathSegment();
 	        case DIRECTIONS:
 	            table = Direction.TABLE_NAME;
 	            break;
 	            
+            case STOP_ID:
+                selection = BaseColumns._ID + " = " + uri.getLastPathSegment();
 	        case STOPS:
 	            table = Stop.TABLE_NAME;
 	            break;
+                
 	            
+            case FAVORITE_ID:
+                selection = BaseColumns._ID + " = " + uri.getLastPathSegment();
 	        case FAVORITES:
 	            table = Favorite.TABLE_NAME;
 	            break;
                 
             default:
-                throw new IllegalArgumentException("URI " + uri + " cannot be deleted by widget configuration content provider.");
+                throw new IllegalArgumentException("URI " + uri + " cannot be updated by widget configuration content provider.");
         }
         
         int count = database.update(table, values, selection, selectionArgs);

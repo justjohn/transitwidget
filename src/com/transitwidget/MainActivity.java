@@ -28,7 +28,10 @@ import com.transitwidget.fragments.StopFragment;
 import com.transitwidget.fragments.StopListFragment;
 import com.transitwidget.utils.AdapterUtils;
 
-public class MainActivity extends SherlockFragmentActivity implements RouteListFragment.Listener, DirectionListFragment.Listener, StopListFragment.Listener, OnBackStackChangedListener {
+public class MainActivity extends SherlockFragmentActivity implements RouteListFragment.Listener,
+                                                                      DirectionListFragment.Listener,
+                                                                      StopListFragment.Listener,
+                                                                      OnBackStackChangedListener {
     public static final String PREFS = "prefs";
 
     private static final String TAG = MainActivity.class.getName();
@@ -78,7 +81,8 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
         breadcrumbs = (TextView) findViewById(R.id.breadcrumbs);
         agencySpinner = (NoDefaultSpinner) findViewById(R.id.agencySpinner);
         
-        mAgency = getSharedPreferences(PREFS, MODE_PRIVATE).getString("agencyTag", null);
+        String defaultAgenty = getString(R.string.defaultAgency);
+        mAgency = getSharedPreferences(PREFS, MODE_PRIVATE).getString("agencyTag", defaultAgenty);
         if (mAgency == null) mFirstRun = true;
         
         // Check if anything has been saved...

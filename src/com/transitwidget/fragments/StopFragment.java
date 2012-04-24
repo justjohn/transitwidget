@@ -1,12 +1,13 @@
 package com.transitwidget.fragments;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +15,15 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.transitwidget.R;
 import com.transitwidget.api.NextBusAPI;
 import com.transitwidget.feed.model.BusPrediction;
+import com.transitwidget.feed.model.Direction;
+import com.transitwidget.feed.model.Favorite;
 import com.transitwidget.feed.model.Stop;
 import com.transitwidget.utils.TimeUtils;
 import java.util.HashMap;
@@ -24,7 +31,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class StopFragment extends Fragment {
+public class StopFragment extends SherlockFragment {
+    private static final String TAG = StopFragment.class.getName();
+    
 	public static final String ARG_STOP_TAG = "stop";
 	public static final String ARG_ROUTE_TAG = "route";
 	public static final String ARG_DIRECTION_TAG = "direction";
@@ -40,8 +49,11 @@ public class StopFragment extends Fragment {
     
     private Stop mStop;
     private String mDirection;
+    private String mDirectionTitle;
     private String mRoute;
     private String mAgency;
+    
+    private boolean mFavorite = false;
     
     private Activity mActivity = null;
     public Handler mHandler = new Handler() {
@@ -69,6 +81,67 @@ public class StopFragment extends Fragment {
         mActivity = getActivity();
 	}
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        MenuItem.OnMenuItemClickListener listener = new MenuItem.OnMenuItemClickListener() {
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.i(TAG, "Changing favorite status of stop " + mStop);
+                
+                String selection = Favorite.AGENCY + " = ? AND " + Favorite.ROUTE + " = ? AND " + Favorite.STOP + " = ?";
+                String[] selectionArgs = {mAgency, mRoute, mStop.getTag()};
+                if (mFavorite) {
+                    // remove favorite
+                    getActivity().getContentResolver().delete(Favorite.CONTENT_URI, selection, selectionArgs);
+                } else {
+                    
+                    // add favorite
+                    Favorite fav = new Favorite();
+                    fav.setAgency(mAgency);
+                    fav.setRoute(mRoute);
+                    fav.setStop(mStop.getTag());
+                    
+                    fav.setDirection(mDirectionTitle);
+                    fav.setStopLabel(mStop.getTitle());
+                    
+                    getActivity().getContentResolver().insert(Favorite.CONTENT_URI, fav.getContentValues());
+                }
+                
+                mFavorite = !mFavorite;
+                
+                // flip menu item
+                if (mFavorite) {
+                    item.setIcon(R.drawable.heart_red);
+                    item.setTitle("-Fav");
+                } else {
+                    item.setIcon(R.drawable.heart);
+                    item.setTitle("+Fav");
+                }
+                return true;
+            }
+        };
+        
+        MenuItem item;
+        if (mFavorite) {
+            item = menu.add("-Fav").setIcon(R.drawable.heart_red);
+        } else {
+            item = menu.add("+Fav").setIcon(R.drawable.heart);
+        }
+        item.setOnMenuItemClickListener(listener).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    }
+    
+    private boolean isFavorite() {
+        boolean favorite = false;
+        
+        String selection = Favorite.AGENCY + " = ? AND " + Favorite.ROUTE + " = ? AND " + Favorite.STOP + " = ?";
+        String[] selectionArgs = {mAgency, mRoute, mStop.getTag()};
+        Cursor c = getActivity().getContentResolver().query(Favorite.CONTENT_URI, new String[] {Favorite._ID}, selection , selectionArgs, null);
+        if (c.moveToFirst()) {
+            favorite = true;
+        }
+        c.close();
+        return favorite;
+    }
+
     class UpdateTask extends AsyncTask<String, String, List<BusPrediction>> {
         private final String TAG = UpdateTask.class.getName();
         
@@ -82,9 +155,6 @@ public class StopFragment extends Fragment {
                 return null;
             }
 
-            if (predictions.isEmpty()) {
-                return null;
-            }
             return predictions;
         }
         @Override
@@ -92,6 +162,11 @@ public class StopFragment extends Fragment {
             Log.i(TAG, "Got bus predictions: " + predictions);
             if (predictions == null) {
                 // Show no data message
+                
+            } else if (predictions.size() == 0) {
+                mNextTime.setText("No Prediction Data");
+                mAbsoluteTime.setText("");
+                mMorePredictions.setAdapter(null);
                 
             } else {
                 BusPrediction nextPrediction = predictions.get(0);
@@ -151,23 +226,35 @@ public class StopFragment extends Fragment {
 		mRoute = getArguments().getString(ARG_ROUTE_TAG);
 		mDirection = getArguments().getString(ARG_DIRECTION_TAG);
 		
-		new AsyncTask<String, String, Cursor>() {
-			@Override
-			protected Cursor doInBackground(String... params) {
-				String selection = Stop.TAG + " = ? AND " + Stop.AGENCY + " = ?"; 
-				String[] selectionArgs = {stopTag, mAgency};
-				Cursor cursor = mActivity.getContentResolver().query(Stop.CONTENT_URI, null, selection, selectionArgs, null);
-				return cursor;
-			}
-            @Override
-			protected void onPostExecute(Cursor result) {
-				if (result != null && result.moveToFirst()) {
-                    mStop = new Stop(result);
-					mStopLabel.setText(mStop.getTitle());
-                    
-                    mHandler.post(new UpdateRunnable());
-				}
-			}
-		}.execute("");
+        Log.i(TAG, "Loading stop with agency: " + mAgency + ",  route: " + mRoute + ", direction: " + mDirection);
+        
+        // Lookup direction
+        String selection = Direction.AGENCY + " = ? AND " + Direction.ROUTE + " = ? AND " + Direction.TAG + " = ?";
+        String[] selectionArgs = { mAgency, mRoute, mDirection };
+        Cursor c = getActivity().getContentResolver().query(Direction.CONTENT_URI, null, selection, selectionArgs, null);
+        if (c.moveToFirst()) {
+            mDirectionTitle = new Direction(c, getActivity()).getTitle();
+        } else {
+            Log.e(TAG, "Unable to lookup direction with tag " + mDirection);
+            mDirectionTitle = mDirection;
+        }
+        c.close();
+        
+        // Lookup stop
+        selection = Stop.TAG + " = ? AND " + Stop.AGENCY + " = ?"; 
+        selectionArgs = new String[] {stopTag, mAgency};
+        Cursor result = mActivity.getContentResolver().query(Stop.CONTENT_URI, null, selection, selectionArgs, null);
+                
+        if (result.moveToFirst()) {
+            mStop = new Stop(result);
+            mStopLabel.setText(mStop.getTitle());
+
+            mHandler.post(new UpdateRunnable());
+            
+            mFavorite = isFavorite();
+        }
+        result.close();
+        
+        setHasOptionsMenu(true);
 	}
 }

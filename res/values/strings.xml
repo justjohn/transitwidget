@@ -4,6 +4,11 @@
     <string name="empty"></string>
     <string name="app_name">Transit Widget</string>
     
+    <!-- default agency for new users. -->
+    <string name="defaultAgency">mbta</string>
+    
+    <string name="menuFavorite">Favorite</string>
+    
     <string name="saveBtnLabel">Save</string>
     <string name="cancelBtnLabel">Cancel</string>
     

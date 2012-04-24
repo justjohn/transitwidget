@@ -5,16 +5,15 @@ import android.content.ContentUris;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.transitwidget.R;
 import com.transitwidget.api.ServiceProvider;
 import com.transitwidget.feed.model.Direction;
 
-public class DirectionListFragment extends ListFragment {
+public class DirectionListFragment extends SherlockListFragment {
     public static final String ARG_AGENCY_TAG = "agencyTag";
     public static final String ARG_ROUTE_TAG = "routeTag";
 

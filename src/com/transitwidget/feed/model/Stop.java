@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
-
 import com.transitwidget.provider.TransitServiceDataProvider;
 
 public class Stop {
@@ -24,6 +23,7 @@ public class Stop {
 	public static final String TAG = "tag";
 	public static final String STOPID = "stopId";
 	public static final String AGENCY = "agency";
+	public static final String FAVORITE = "favorite";
 
 	public Stop() {}
 	
@@ -33,6 +33,7 @@ public class Stop {
 		this.title = cursor.getString(cursor.getColumnIndex(TITLE));
 		this.agency = cursor.getString(cursor.getColumnIndex(AGENCY));
 		this.stopId = cursor.getInt(cursor.getColumnIndex(STOPID));
+		this.favorite = cursor.getInt(cursor.getColumnIndex(FAVORITE));
 	}
 
 	public ContentValues getContentValues() {
@@ -41,6 +42,7 @@ public class Stop {
 		values.put(TITLE, title);
 		values.put(TAG, tag);
 		values.put(AGENCY, agency);
+		values.put(FAVORITE, getFavorite());
 		return values;
 	}
 
@@ -49,6 +51,7 @@ public class Stop {
 	private String tag;
 	private String title;
 	private String agency;
+	private int favorite;
 	
 	public String getTitle() {
 		return title;
@@ -83,7 +86,28 @@ public class Stop {
 	public void setAgency(String agency) {
 		this.agency = agency;
 	}
-	
+
+	public int getStopId() {
+		return stopId;
+	}
+
+	public void setStopId(int stopId) {
+		this.stopId = stopId;
+	}
+
+    /**
+     * @return the favorite
+     */
+    public int getFavorite() {
+        return favorite;
+    }
+
+    /**
+     * @param favorite the favorite to set
+     */
+    public void setFavorite(int favorite) {
+        this.favorite = favorite;
+    }
 
     /**
      * Creates the underlying database.
@@ -92,6 +116,7 @@ public class Stop {
 		String sql = "CREATE TABLE " + TABLE_NAME + " ( " 
 				   + _ID + " INTEGER PRIMARY KEY, "
 				   + STOPID + " INTEGER, "
+				   + FAVORITE + " INTEGER DEFAULT 0, "
 				   + TAG + " TEXT, "
 				   + AGENCY + " TEXT, "
 				   + TITLE + " TEXT"
@@ -106,13 +131,10 @@ public class Stop {
      */
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// Nothing to do here (yet)
+        if (oldVersion < 3) {
+            String sql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + FAVORITE + " INTEGER DEFAULT 0;";
+            Log.w(LOGTAG, "Adding column favorites to service stop table: " + sql);
+            db.execSQL(sql);
+        }
     }
-
-	public int getStopId() {
-		return stopId;
-	}
-
-	public void setStopId(int stopId) {
-		this.stopId = stopId;
-	}
 }
