@@ -1,9 +1,8 @@
 package com.transitwidget.fragments;
 
 import android.app.Activity;
-import android.content.ContentUris;
+import android.content.res.Configuration;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,6 +52,8 @@ public class StopFragment extends SherlockFragment {
     private String mRoute;
     private String mAgency;
     
+    private List<BusPrediction> mPredictions;
+    
     private boolean mFavorite = false;
     
     private Activity mActivity = null;
@@ -99,8 +100,10 @@ public class StopFragment extends SherlockFragment {
                     fav.setAgency(mAgency);
                     fav.setRoute(mRoute);
                     fav.setStop(mStop.getTag());
+                    fav.setDirection(mDirection);
                     
-                    fav.setDirection(mDirectionTitle);
+                    // convenience data for list display
+                    fav.setDirectionLabel(mDirectionTitle);
                     fav.setStopLabel(mStop.getTitle());
                     
                     getActivity().getContentResolver().insert(Favorite.CONTENT_URI, fav.getContentValues());
@@ -160,55 +163,73 @@ public class StopFragment extends SherlockFragment {
         @Override
         protected void onPostExecute(List<BusPrediction> predictions) {
             Log.i(TAG, "Got bus predictions: " + predictions);
-            if (predictions == null) {
-                // Show no data message
-                
-            } else if (predictions.size() == 0) {
-                mNextTime.setText("No Prediction Data");
-                mAbsoluteTime.setText("");
-                mMorePredictions.setAdapter(null);
-                
-            } else {
-                BusPrediction nextPrediction = predictions.get(0);
-                predictions.remove(0);
-                
-                String nextTime = TimeUtils.formatTimeOfNextBus(nextPrediction.getEpochTime());
-                String absoluteTime = TimeUtils.formatAbsoluteTimeOfNextBus(nextPrediction.getEpochTime());
+            mPredictions = predictions;
+            updateUI();
+        }
+    }
+    
+    private void updateUI() {
+        if (mPredictions == null) {
+            // Show no data message
 
-                mNextTime.setText(nextTime);
-                mAbsoluteTime.setText(absoluteTime);
-                
-                List<Map<String,?>> predictionsList = new LinkedList<Map<String,?>>();  
-                    
-                for (BusPrediction prediction : predictions) {
-                    long predictionTime = prediction.getEpochTime();
-                    
-                    String timeUntil = TimeUtils.formatTimeOfNextBus(predictionTime);
-                    String timeAt = TimeUtils.formatAbsoluteTimeOfNextBus(predictionTime);
-                    
-                    Map<String,String> item = new HashMap<String, String>();
-                    item.put(ITEM_TITLE, timeUntil);
-                    item.put(ITEM_CAPTION, timeAt);
-                    
-                    predictionsList.add(item);
-                }
+        } else if (mPredictions.size() == 0) {
+            mNextTime.setText("No Prediction Data");
+            mAbsoluteTime.setText("");
+            mMorePredictions.setAdapter(null);
 
-                String[] mapping = { ITEM_TITLE, ITEM_CAPTION };
-                int[] fields = { R.id.list_title, R.id.list_caption };
-                
-                if (getActivity() != null) {
-                    mMorePredictions.setAdapter(new SimpleAdapter(getActivity(), predictionsList, R.layout.list_complex, mapping, fields));
+        } else {
+            BusPrediction nextPrediction = mPredictions.get(0);
+
+            String nextTime = TimeUtils.formatTimeOfNextBus(nextPrediction.getEpochTime());
+            String absoluteTime = TimeUtils.formatAbsoluteTimeOfNextBus(nextPrediction.getEpochTime());
+
+            mNextTime.setText(nextTime);
+            mAbsoluteTime.setText(absoluteTime);
+
+            List<Map<String,?>> predictionsList = new LinkedList<Map<String,?>>();  
+
+            boolean skipFirst = true;
+            for (BusPrediction prediction : mPredictions) {
+                if (skipFirst) {
+                    skipFirst = false;
+                    continue;
                 }
+                long predictionTime = prediction.getEpochTime();
+
+                String timeUntil = TimeUtils.formatTimeOfNextBus(predictionTime);
+                String timeAt = TimeUtils.formatAbsoluteTimeOfNextBus(predictionTime);
+
+                Map<String,String> item = new HashMap<String, String>();
+                item.put(ITEM_TITLE, timeUntil);
+                item.put(ITEM_CAPTION, timeAt);
+
+                predictionsList.add(item);
+            }
+
+            String[] mapping = { ITEM_TITLE, ITEM_CAPTION };
+            int[] fields = { R.id.list_title, R.id.list_caption };
+
+            if (getActivity() != null) {
+                mMorePredictions.setAdapter(new SimpleAdapter(getActivity(), predictionsList, R.layout.list_complex, mapping, fields));
             }
         }
     }
     
     class UpdateRunnable implements Runnable {
+        int i = 0;
         public void run() {
             // stop updating if this fragment is no longer visible
-            if (isVisible()) {
-                new UpdateTask().execute("");
-                mHandler.postDelayed(new UpdateRunnable(), 20000);
+            if (isResumed()) {
+                updateUI();
+                if (i % 20 == 0) {
+                    i = 0;
+                    new UpdateTask().execute();
+                }
+                i++;
+                
+                mHandler.postDelayed(this, 1000);
+            } else {
+                Log.i(TAG, "Stopping prediction check");
             }
         }
     }
@@ -248,8 +269,6 @@ public class StopFragment extends SherlockFragment {
         if (result.moveToFirst()) {
             mStop = new Stop(result);
             mStopLabel.setText(mStop.getTitle());
-
-            mHandler.post(new UpdateRunnable());
             
             mFavorite = isFavorite();
         }
@@ -257,4 +276,13 @@ public class StopFragment extends SherlockFragment {
         
         setHasOptionsMenu(true);
 	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        Log.i(TAG, "Starting bus prediction check");
+        // mHandler.post(new UpdateRunnable());
+        mHandler.post(new UpdateRunnable());
+    }
 }

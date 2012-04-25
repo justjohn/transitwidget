@@ -66,6 +66,9 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     private ActionBar actionBar;
     private FragmentManager mFragmentManager;
     
+    /** Should changing tabs reset.  Will be set to false after a configuration change. */
+    private boolean mReset = true;
+    
     /** Flag to ignore the first selection event on the agency spinner. */
     private boolean mFirstRun = false;
 
@@ -92,6 +95,8 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
             mDirection = savedInstanceState.getString(STATE_DIRECTION);
             mDirectionTitle = savedInstanceState.getString(STATE_DIRECTION_TITLE);
             mStop = savedInstanceState.getString(STATE_STOP);
+            
+            mReset = false;
         }
         
         // default to routes browser tab
@@ -108,6 +113,17 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 			public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
 				// load fragment
 		    	mTag = TAG_ROUTES;
+                // mReset is used to prevent state from being lost on a configuration change (screen rotation).
+                if (mReset) {
+                    mStop = null;
+                    mDirection = null;
+                    mDirectionTitle = null;
+                    mRoute = null;
+                    
+                } else {
+                    mReset = true;
+                }
+                clearBackStack();
                 loadSelected();
 			}
 		}));
@@ -120,6 +136,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 			public void onTabSelected(Tab arg0, FragmentTransaction arg1) {
 				// load fragment
 		    	mTag = TAG_FAVORITES;
+                clearBackStack();
 				loadFavorites();
 			}
 		}));
@@ -173,6 +190,11 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     }
     
     private void loadFavorites() {
+        mStop = null;
+        mDirection = null;
+        mDirectionTitle = null;
+        mRoute = null;
+        
     	Bundle args = new Bundle();
     	args.putString(RouteListFragment.ARG_AGENCY_TAG, mAgency);
     	Fragment fragment = Fragment.instantiate(this, FavoritesFragment.class.getName(), args);
@@ -198,6 +220,11 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     }
     
     public void agencySelected() {
+        mStop = null;
+        mDirection = null;
+        mDirectionTitle = null;
+        mRoute = null;
+        
     	Bundle args = new Bundle();
     	args.putString(RouteListFragment.ARG_AGENCY_TAG, mAgency);
     	Fragment fragment = Fragment.instantiate(this, RouteListFragment.class.getName(), args);
@@ -254,6 +281,15 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
     	args.putString(StopFragment.ARG_STOP_TAG, mStop);
     	Fragment fragment = Fragment.instantiate(this, StopFragment.class.getName(), args);
     	loadFragment(fragment, true);
+	}
+
+	public void stopSelected(String tag, String direction, String route) {
+		Log.i(TAG, "Stop selected: " + tag + " with direction: " + direction + " and route: " + route);
+		mStop = tag;
+        mRoute = route;
+        mDirection = direction;
+		
+        stopSelected(tag);
 	}
 	
 	/**
@@ -343,7 +379,7 @@ public class MainActivity extends SherlockFragmentActivity implements RouteListF
 			Log.i(TAG, "get selected agency with id " + selectedAgency);
 	        
 	        startManagingCursor(cursor);
-	        agencyAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.single_list_item, cursor, new String[] {Agency.TITLE}, new int[] {R.id.value}, 0);
+	        agencyAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.single_list_item, cursor, new String[] {Agency.TITLE}, new int[] {R.id.value});
 	        agencySpinner.setAdapter(agencyAdapter);
 	        
 	        int position = 0;

@@ -21,7 +21,7 @@ public class TransitServiceDataProvider extends ContentProvider {
     private static final String TAG = TransitServiceDataProvider.class.getName();
 	
     private static final String DATABASE_NAME = "transitServiceData.db";
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 
     public static final String AUTHORITY = "transitwidget.provider.TransitServiceDataProvider";
     

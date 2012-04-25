@@ -23,6 +23,7 @@ public class Favorite {
 	
 	public static final String STOP_LABEL = "stopLabel";
 	public static final String ROUTE_LABEL = "routeLabel";
+	public static final String DIRECTION_LABEL = "directionLabel";
 	
 	public static final String ROUTE = "route";
 	public static final String DIRECTION = "direction";
@@ -39,6 +40,7 @@ public class Favorite {
 	private String agency;
 
 	private String stopLabel;
+	private String directionLabel;
 	private String routeLabel;
 	
 	public Favorite() {}
@@ -48,6 +50,7 @@ public class Favorite {
 		agency = cursor.getString(cursor.getColumnIndex(AGENCY));
 		route = cursor.getString(cursor.getColumnIndex(ROUTE));
 		direction = cursor.getString(cursor.getColumnIndex(DIRECTION));
+		directionLabel = cursor.getString(cursor.getColumnIndex(DIRECTION_LABEL));
 		stop = cursor.getString(cursor.getColumnIndex(STOP));
 		stopLabel = cursor.getString(cursor.getColumnIndex(STOP_LABEL));
 		routeLabel = cursor.getString(cursor.getColumnIndex(ROUTE_LABEL));
@@ -60,6 +63,7 @@ public class Favorite {
 		values.put(ROUTE, route);
 		values.put(AGENCY, agency);
 		values.put(STOP_LABEL, stopLabel);
+		values.put(DIRECTION_LABEL, directionLabel);
 		values.put(ROUTE_LABEL, routeLabel);
 		return values;
 	}
@@ -137,6 +141,7 @@ public class Favorite {
 					   + DIRECTION + " TEXT, "
 					   + STOP + " TEXT, "
 					   + ROUTE_LABEL + " TEXT, "
+					   + DIRECTION_LABEL + " TEXT, "
 					   + STOP_LABEL + " TEXT"
 				   + " );";
 
@@ -149,5 +154,24 @@ public class Favorite {
      */
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     	if (newVersion == 2) onCreate(db);
+        if (oldVersion < 4) {
+            String sql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + DIRECTION_LABEL + " TEXT;";
+            Log.w(LOGTAG, "Adding column favorites to service stop table: " + sql);
+            db.execSQL(sql);
+        }
+    }
+
+    /**
+     * @return the directionLabel
+     */
+    public String getDirectionLabel() {
+        return directionLabel;
+    }
+
+    /**
+     * @param directionLabel the directionLabel to set
+     */
+    public void setDirectionLabel(String directionLabel) {
+        this.directionLabel = directionLabel;
     }
 }

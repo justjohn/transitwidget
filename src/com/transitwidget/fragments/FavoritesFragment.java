@@ -24,7 +24,7 @@ public class FavoritesFragment extends SherlockListFragment {
     	
     	mListener = (Listener)getActivity();
     	
-        String[] from = {Favorite.STOP_LABEL, Favorite.ROUTE, Favorite.DIRECTION};
+        String[] from = {Favorite.STOP_LABEL, Favorite.ROUTE, Favorite.DIRECTION_LABEL};
         int[] to = {R.id.stop, R.id.route, R.id.direction};
         
         mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.favorite_list_item, null, from, to);
@@ -68,14 +68,16 @@ public class FavoritesFragment extends SherlockListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
     	super.onListItemClick(l, v, position, id);
-		Cursor cursor = getActivity().getContentResolver().query(ContentUris.withAppendedId(Favorite.CONTENT_URI, id), new String[] { Favorite.STOP }, null, null, null);
-		String tag = null;
+		Cursor cursor = getActivity().getContentResolver().query(ContentUris.withAppendedId(Favorite.CONTENT_URI, id), new String[] { Favorite.STOP, Favorite.DIRECTION, Favorite.ROUTE }, null, null, null);
+		String tag = null, direction = null, route = null;
 		if (cursor.moveToFirst()) {
-			tag = cursor.getString(0);
+			tag = cursor.getString(cursor.getColumnIndex(Favorite.STOP));
+			direction = cursor.getString(cursor.getColumnIndex(Favorite.DIRECTION));
+			route = cursor.getString(cursor.getColumnIndex(Favorite.ROUTE));
 		}
 
 		if (tag != null) {
-    		mListener.stopSelected(tag);
+    		mListener.stopSelected(tag, direction, route);
 		}
     }
 }

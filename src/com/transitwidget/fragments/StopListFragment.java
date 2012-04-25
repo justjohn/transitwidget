@@ -91,6 +91,7 @@ public class StopListFragment extends SherlockListFragment {
     }
     
     public static interface Listener {
+    	void stopSelected(String tag, String directionTag, String routeTag);
     	void stopSelected(String tag);
     }
 }

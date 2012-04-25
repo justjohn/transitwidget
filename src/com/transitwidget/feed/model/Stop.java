@@ -130,7 +130,6 @@ public class Stop {
      * Upgrade the database tables.
      */
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// Nothing to do here (yet)
         if (oldVersion < 3) {
             String sql = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + FAVORITE + " INTEGER DEFAULT 0;";
             Log.w(LOGTAG, "Adding column favorites to service stop table: " + sql);
