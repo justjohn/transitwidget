@@ -21,8 +21,11 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.text.format.DateFormat;
 import android.util.Log;
+import com.transitwidget.feed.model.Direction;
+import com.transitwidget.feed.model.Stop;
 
 /**
  * Handles reading prediction data from feeds and triggering widget updates.
@@ -129,14 +132,24 @@ public class MBTABackgroundService extends IntentService {
 			CharSequence tickerText = predictions.toString();
 			long when = System.currentTimeMillis();
 	
+            // Lookup stop
+            String selection = Stop.TAG + " = ? AND " + Stop.AGENCY + " = ?"; 
+            String[] selectionArgs = new String[] {stopTag, agency};
+            Cursor result = getContentResolver().query(Stop.CONTENT_URI, null, selection, selectionArgs, null);
+            String stopLabel = "Unknown";
+            if (result.moveToFirst()) {
+                stopLabel = new Stop(result).getTitle();
+            }
+            result.close();
+        
 			Notification notification = new Notification(icon, tickerText, when);
 			
 			Context context = getApplicationContext();
 			Intent notificationIntent = new Intent("notification-action");
 			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 	
-			CharSequence contentTitle = "My notification";
-			CharSequence contentText = "Hello World!";
+			CharSequence contentTitle = TimeUtils.formatTimeOfNextBus(nextPrediction.getEpochTime());
+			CharSequence contentText = routeTag + ": " + stopLabel;
 			notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 	
 			nm.notify(0, notification);
@@ -177,5 +190,4 @@ public class MBTABackgroundService extends IntentService {
 				ctx, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		return pi;
 	}
-	
 }
