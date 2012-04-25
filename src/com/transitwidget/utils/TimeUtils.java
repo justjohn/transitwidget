@@ -35,6 +35,8 @@ public class TimeUtils {
 
         } else {
             long seconds = (nextTimeMs - now) / 1000;
+            if (seconds < 0) seconds = 0; // don't display negative times
+            
             long minutes = seconds / 60;
             seconds -= minutes * 60;
             nextTime = minutes + "m " + seconds + "s";
