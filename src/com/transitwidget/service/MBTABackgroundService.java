@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.text.format.DateFormat;
 import android.util.Log;
+import com.transitwidget.R;
 import com.transitwidget.feed.model.Direction;
 import com.transitwidget.feed.model.Stop;
 
@@ -128,7 +129,6 @@ public class MBTABackgroundService extends IntentService {
 				secondPrediction = predictions.get(1);
 			}
 			
-			int icon = android.R.drawable.ic_menu_compass;
 			CharSequence tickerText = predictions.toString();
 			long when = System.currentTimeMillis();
 	
@@ -142,7 +142,7 @@ public class MBTABackgroundService extends IntentService {
             }
             result.close();
         
-			Notification notification = new Notification(icon, tickerText, when);
+			Notification notification = new Notification(R.drawable.icon_bus, tickerText, when);
 			
 			Context context = getApplicationContext();
 			Intent notificationIntent = new Intent("notification-action");
@@ -152,7 +152,7 @@ public class MBTABackgroundService extends IntentService {
 			CharSequence contentText = routeTag + ": " + stopLabel;
 			notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
 	
-			nm.notify(0, notification);
+			nm.notify(widgetId, notification);
 	
 			Log.i(TAG, "Sent notification: " + tickerText);
 		}
