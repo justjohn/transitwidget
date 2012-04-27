@@ -22,6 +22,7 @@ import com.transitwidget.adapters.BaseItemAdapter;
 import com.transitwidget.feed.model.Agency;
 import com.transitwidget.prefs.*;
 import com.transitwidget.service.AlarmSchedulerService;
+import com.transitwidget.service.MBTABackgroundService;
 import com.transitwidget.utils.AdapterUtils;
 import com.transitwidget.utils.TimeUtils;
 import java.util.ArrayList;
@@ -83,13 +84,6 @@ public class WidgetConfigActivity extends Activity {
     private void updateEndDisplay() {
         updateDisplay(endTimeView, endHour, endMinute);
     }
-
-    private static String pad(int c) {
-        if (c >= 10)
-            return String.valueOf(c);
-        else
-            return "0" + String.valueOf(c);
-    }
     
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -117,8 +111,15 @@ public class WidgetConfigActivity extends Activity {
         endTimeView = (TextView) findViewById(R.id.endTimePickerValue);
         
         Calendar cal = Calendar.getInstance();
-        startHour = endHour = cal.get(Calendar.HOUR_OF_DAY);
-        startMinute = endMinute = cal.get(Calendar.MINUTE);
+        startHour = cal.get(Calendar.HOUR_OF_DAY);
+        startMinute = cal.get(Calendar.MINUTE);
+        
+        cal.add(Calendar.MINUTE, 60);
+        endHour = cal.get(Calendar.HOUR_OF_DAY);
+        endMinute = cal.get(Calendar.MINUTE);
+        
+        updateStartDisplay();
+        updateEndDisplay();
         
         findViewById(R.id.startTimePicker).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -170,6 +171,7 @@ public class WidgetConfigActivity extends Activity {
                 Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
                 serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, mAppWidgetId);
                 serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, startTime);
+                serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_END_TIME, endTime);
                 startService(serviceIntent);
 
                 finish();
@@ -192,7 +194,7 @@ public class WidgetConfigActivity extends Activity {
 
         // If they gave us an intent without the widget id, just bail.
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-            //finish();
+            finish();
         }
         
         agencySpinner = (NoDefaultSpinner) findViewById(R.id.agencySpinner);
@@ -332,6 +334,7 @@ public class WidgetConfigActivity extends Activity {
 			return arg[0].getAgencies();
 		}
 
+        @Override
         protected void onPostExecute(List<NextBusAgency> result) {
         	agencyAdapter = createAdapter(result, agencySpinner);
         	agencySpinner.setEnabled(true);
@@ -351,6 +354,7 @@ public class WidgetConfigActivity extends Activity {
 			return arg[0].getRoutes();
 		}
 
+        @Override
         protected void onPostExecute(List<NextBusRoute> result) {
         	routeAdapter = createAdapter(result, routeSpinner);
         	routeSpinner.setEnabled(true);
@@ -363,6 +367,7 @@ public class WidgetConfigActivity extends Activity {
 			return arg[0].getDirections();
 		}
 
+        @Override
         protected void onPostExecute(List<NextBusDirection> result) {
         	directionAdapter = createAdapter(result, directionSpinner);
         	directionSpinner.setEnabled(true);
@@ -375,6 +380,7 @@ public class WidgetConfigActivity extends Activity {
 			return arg[0].getStops();
 		}
 
+        @Override
         protected void onPostExecute(List<NextBusStop> result) {
         	endPointAdapter = createAdapter(result, stopSpinner);
         	stopSpinner.setEnabled(true);

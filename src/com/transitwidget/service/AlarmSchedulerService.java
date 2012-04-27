@@ -21,6 +21,7 @@ public class AlarmSchedulerService extends IntentService {
 	/** The time of day to begin updating the widget.
 	 *  	This should be represented in seconds since midnight. */
 	public static final String EXTRA_DAY_START_TIME = "EXTRA_DAY_START_TIME";
+	public static final String EXTRA_DAY_END_TIME = "EXTRA_DAY_END_TIME";
 	
 	public AlarmSchedulerService() {
 		super("AlarmSchedulerService");
@@ -30,16 +31,20 @@ public class AlarmSchedulerService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		
 		int widgetId = intent.getIntExtra(EXTRA_WIDGET_ID, -1);
-		int secondsSinceMidnight = intent.getIntExtra(EXTRA_DAY_START_TIME, -1);
+		int startSecondsSinceMidnight = intent.getIntExtra(EXTRA_DAY_START_TIME, -1);
+		int endSecondsSinceMidnight = intent.getIntExtra(EXTRA_DAY_END_TIME, -1);
 		
 		// Determine the time today of the seconds since midnight.
-		Calendar cal = TimeUtils.getCalendarWithTimeFromMidnight(secondsSinceMidnight);
+		Calendar startCal = TimeUtils.getCalendarWithTimeFromMidnight(startSecondsSinceMidnight);
+		Calendar endCal = TimeUtils.getCalendarWithTimeFromMidnight(endSecondsSinceMidnight);
+        Calendar now = Calendar.getInstance();
+        
+        if (endCal.before(startCal)) endCal.add(Calendar.DAY_OF_MONTH, 1);
 		
-		if (cal.before(Calendar.getInstance())) {
-			// The time has already passed today
-			// increment by a day
-			
-			cal.add(Calendar.DAY_OF_MONTH, 1);
+		if (startCal.before(now) && endCal.before(now)) {
+			// The time window has already passed today
+			// schedule the first update interval in a day
+			startCal.add(Calendar.DAY_OF_MONTH, 1);
 		}
 
         Intent serviceIntent = MBTABackgroundService.createPredictionIntent(getApplicationContext(), widgetId);
@@ -48,8 +53,8 @@ public class AlarmSchedulerService extends IntentService {
 		PendingIntent pendingIntent = MBTABackgroundService.getPendingIntent(getApplicationContext(), serviceIntent, widgetId);
 		
 		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), INTERVAL, pendingIntent);
+		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startCal.getTimeInMillis(), INTERVAL, pendingIntent);
 		
-		Log.i(TAG, "Scheduling start time for " + DateFormat.format("MMM dd, yyyy h:mmaa", cal));
+		Log.i(TAG, "Scheduling start time for " + DateFormat.format("MMM dd, yyyy h:mmaa", startCal));
 	}
 }

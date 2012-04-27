@@ -10,8 +10,6 @@ import android.widget.RemoteViews;
 import com.transitwidget.R;
 import com.transitwidget.prefs.NextBusObserverConfig;
 import com.transitwidget.utils.TimeUtils;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class UpdateWidgetService extends Service {
 	private static final String TAG = UpdateWidgetService.class.getName();
