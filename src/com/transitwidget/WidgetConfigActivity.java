@@ -22,7 +22,6 @@ import com.transitwidget.adapters.BaseItemAdapter;
 import com.transitwidget.feed.model.Agency;
 import com.transitwidget.prefs.*;
 import com.transitwidget.service.AlarmSchedulerService;
-import com.transitwidget.service.MBTABackgroundService;
 import com.transitwidget.utils.AdapterUtils;
 import com.transitwidget.utils.TimeUtils;
 import java.util.ArrayList;

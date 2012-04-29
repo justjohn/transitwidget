@@ -1,7 +1,6 @@
 package com.transitwidget.fragments;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;

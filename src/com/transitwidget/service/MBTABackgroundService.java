@@ -3,16 +3,6 @@
  */
 package com.transitwidget.service;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-
-import com.transitwidget.api.NextBusAPI;
-import com.transitwidget.feed.model.BusPrediction;
-import com.transitwidget.prefs.NextBusObserverConfig;
-import com.transitwidget.utils.TimeUtils;
-
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -25,8 +15,14 @@ import android.database.Cursor;
 import android.text.format.DateFormat;
 import android.util.Log;
 import com.transitwidget.R;
-import com.transitwidget.feed.model.Direction;
+import com.transitwidget.api.NextBusAPI;
+import com.transitwidget.feed.model.BusPrediction;
 import com.transitwidget.feed.model.Stop;
+import com.transitwidget.prefs.NextBusObserverConfig;
+import com.transitwidget.utils.TimeUtils;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Handles reading prediction data from feeds and triggering widget updates.
@@ -72,7 +68,7 @@ public class MBTABackgroundService extends IntentService {
 
 			// Remove any alarms for this widget
 			AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-			alarmManager.cancel(getPendingIntent(getApplicationContext(), intent, widgetId));
+			alarmManager.cancel(getPendingIntent(getApplicationContext(), widgetId));
 			Log.i(TAG, "onHandleIntent: canceling alarm");
 			return;
 		}
@@ -96,12 +92,13 @@ public class MBTABackgroundService extends IntentService {
 			
 			Log.i(TAG, "onHandleIntent: canceling alarm and scheduling for tomorrow");
 			AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-			alarmManager.cancel(getPendingIntent(getApplicationContext(), intent, widgetId));
+			alarmManager.cancel(getPendingIntent(getApplicationContext(), widgetId));
 
 			// Schedule the start time tomorrow
 			Intent serviceIntent = new Intent(getApplicationContext(), AlarmSchedulerService.class);
 			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_WIDGET_ID, widgetId);
 			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_START_TIME, config.getStartObserving());
+			serviceIntent.putExtra(AlarmSchedulerService.EXTRA_DAY_END_TIME, config.getStopObserving());
 			startService(serviceIntent);
 			
 			return;
@@ -185,9 +182,9 @@ public class MBTABackgroundService extends IntentService {
 		return intent;
 	}
 
-	public static PendingIntent getPendingIntent(Context ctx, Intent intent, int widgetId) {
+	public static PendingIntent getPendingIntent(Context ctx, int widgetId) {
 		PendingIntent pi = PendingIntent.getService(
-				ctx, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+				ctx, 0, createPredictionIntent(ctx, widgetId), PendingIntent.FLAG_CANCEL_CURRENT);
 		return pi;
 	}
 }

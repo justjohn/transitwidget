@@ -35,26 +35,52 @@ public class AlarmSchedulerService extends IntentService {
 		int endSecondsSinceMidnight = intent.getIntExtra(EXTRA_DAY_END_TIME, -1);
 		
 		// Determine the time today of the seconds since midnight.
-		Calendar startCal = TimeUtils.getCalendarWithTimeFromMidnight(startSecondsSinceMidnight);
-		Calendar endCal = TimeUtils.getCalendarWithTimeFromMidnight(endSecondsSinceMidnight);
+		Calendar intervalStart = TimeUtils.getCalendarWithTimeFromMidnight(startSecondsSinceMidnight);
+		Calendar intervalEnd = TimeUtils.getCalendarWithTimeFromMidnight(endSecondsSinceMidnight);
         Calendar now = Calendar.getInstance();
         
-        if (endCal.before(startCal)) endCal.add(Calendar.DAY_OF_MONTH, 1);
-		
-		if (startCal.before(now) && endCal.before(now)) {
-			// The time window has already passed today
-			// schedule the first update interval in a day
-			startCal.add(Calendar.DAY_OF_MONTH, 1);
-		}
+        Calendar updateStartTime = intervalStart;
 
-        Intent serviceIntent = MBTABackgroundService.createPredictionIntent(getApplicationContext(), widgetId);
-        serviceIntent.putExtra(MBTABackgroundService.EXTRA_WIDGET_ID, widgetId);
+        /*
+         * How to handle start time of the interval when "now" is in the
+         * given interval of the day relative to start/end time.
+         * 
+         * - start time before end time
+         * 
+         * |--------[---------]--------|
+         *  schedule   start   schedule
+         *   today      now    tomorrow
+         * 
+         * - end time before start time
+         * 
+         * |--------]---------[--------|
+         *   start   schedule   start
+         *    now     today      now
+         */
         
-		PendingIntent pendingIntent = MBTABackgroundService.getPendingIntent(getApplicationContext(), serviceIntent, widgetId);
+		if (intervalEnd.after(intervalStart)) {
+			// schedule the first update interval "tomorrow"
+            if (intervalEnd.before(now)) {
+                updateStartTime.add(Calendar.DAY_OF_MONTH, 1);
+            } else if (intervalStart.after(now)) {
+                // leave as intervalStart
+            } else {
+                updateStartTime = now;
+            }
+            
+		} else {
+            if (intervalEnd.before(now) || intervalStart.after(now)) {
+                updateStartTime = now;
+            } else {
+                // leave as intervalStart
+            }
+        }
+        
+		PendingIntent pendingIntent = MBTABackgroundService.getPendingIntent(getApplicationContext(), widgetId);
 		
 		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, startCal.getTimeInMillis(), INTERVAL, pendingIntent);
+		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, updateStartTime.getTimeInMillis(), INTERVAL, pendingIntent);
 		
-		Log.i(TAG, "Scheduling start time for " + DateFormat.format("MMM dd, yyyy h:mmaa", startCal));
+		Log.i(TAG, "Scheduling start time for " + DateFormat.format("MMM dd, yyyy h:mmaa", intervalStart));
 	}
 }
