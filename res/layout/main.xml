@@ -2,29 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    
-    <com.transitwidget.NoDefaultSpinner
-        android:layout_alignParentTop="true"
-        android:prompt="@string/empty"
-        android:id="@+id/agencySpinner"
-        android:layout_width="fill_parent"
-        android:layout_height="55dp" />
-    
-    <TextView 
+
+    <TextView
         android:id="@+id/breadcrumbs"
         android:layout_alignParentBottom="true"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp" 
+        android:padding="10dp"
         android:background="#001"
         android:textStyle="bold" />
-        
+
     <FrameLayout
         android:id="@+id/main_fragment_container"
-        android:layout_below="@id/agencySpinner"
+        android:layout_alignParentTop="true"
         android:layout_above="@id/breadcrumbs"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
          />
-    
+
 </RelativeLayout>

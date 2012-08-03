@@ -21,12 +21,12 @@ public class FavoritesFragment extends SherlockListFragment {
     @Override
     public void onStart() {
     	super.onStart();
-    	
+
     	mListener = (Listener)getActivity();
-    	
+
         String[] from = {Favorite.STOP_LABEL, Favorite.ROUTE, Favorite.DIRECTION_LABEL};
         int[] to = {R.id.stop, R.id.route, R.id.direction};
-        
+
         mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.favorite_list_item, null, from, to);
         setListAdapter(mAdapter);
     }
@@ -34,15 +34,14 @@ public class FavoritesFragment extends SherlockListFragment {
     @Override
     public void onResume() {
     	super.onResume();
-    	
-        String agencyTag = getArguments().getString(ARG_AGENCY_TAG);
-        
-        loadList(agencyTag);
+
+      String agencyTag = getArguments().getString(ARG_AGENCY_TAG);
+      loadList(agencyTag);
     }
-    
+
     public void loadList(final String agencyTag) {
     	final Activity activity = this.getActivity();
-    	
+
     	new AsyncTask<String, Integer, Cursor>() {
     		protected void onPreExecute() {
     			setListShown(false);
@@ -52,8 +51,8 @@ public class FavoritesFragment extends SherlockListFragment {
     	        String selection = Favorite.AGENCY + " = ?";
     	        String[] selecitonArgs = { agencyTag };
     			Cursor cursor = activity.getContentResolver().query(Favorite.CONTENT_URI, null, selection, selecitonArgs, null);
-    			
-    	    	return cursor;
+
+          return cursor;
     		}
     		protected void onPostExecute(Cursor cursor) {
     			activity.startManagingCursor(cursor);
