@@ -32,6 +32,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".AgencySelectActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" />
+        
         <!-- Receiver that will eventually restore alarms after a reboot. -->
         <receiver android:name=".receiver.WakeupReceiver" >
             <intent-filter>
