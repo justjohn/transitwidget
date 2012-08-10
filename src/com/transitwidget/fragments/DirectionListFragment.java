@@ -20,11 +20,15 @@ public class DirectionListFragment extends SherlockListFragment {
 	private SimpleCursorAdapter mAdapter;
     private Listener mListener;
     
+    public DirectionListFragment(Listener listener, Bundle args) {
+        super();
+        mListener = listener;
+        setArguments(args);
+    }
+    
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
     	super.onViewCreated(view, savedInstanceState);
-
-    	mListener = (Listener)getActivity();
     	
         String[] from = {Direction.TITLE};
         int[] to = {R.id.value};

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -18,11 +19,15 @@ public class RouteListFragment extends SherlockListFragment {
 	private SimpleCursorAdapter mAdapter;
     private Listener mListener;
     
+    public RouteListFragment(Listener listener, Bundle args) {
+        super();
+        mListener = listener;
+        setArguments(args);
+    }
+        
     @Override
     public void onStart() {
     	super.onStart();
-    	
-    	mListener = (Listener)getActivity();
     	
         String[] from = {Route.TITLE};
         int[] to = {com.transitwidget.R.id.value};

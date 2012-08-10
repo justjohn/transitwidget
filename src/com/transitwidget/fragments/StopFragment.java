@@ -131,6 +131,53 @@ public class StopFragment extends SherlockFragment {
         item.setOnMenuItemClickListener(listener).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
     
+	@Override
+	public void onStart() {
+		super.onStart();
+		final String stopTag = getArguments().getString(ARG_STOP_TAG);
+		mAgency = getArguments().getString(ARG_AGENCY_TAG);
+		mRoute = getArguments().getString(ARG_ROUTE_TAG);
+		mDirection = getArguments().getString(ARG_DIRECTION_TAG);
+		
+        Log.i(TAG, "Loading stop with agency: " + mAgency + ",  route: " + mRoute + ", direction: " + mDirection);
+        
+        // Lookup direction
+        String selection = Direction.AGENCY + " = ? AND " + Direction.ROUTE + " = ? AND " + Direction.TAG + " = ?";
+        String[] selectionArgs = { mAgency, mRoute, mDirection };
+        Cursor c = getActivity().getContentResolver().query(Direction.CONTENT_URI, null, selection, selectionArgs, null);
+        if (c.moveToFirst()) {
+            mDirectionTitle = new Direction(c, getActivity()).getTitle();
+        } else {
+            Log.e(TAG, "Unable to lookup direction with tag " + mDirection);
+            mDirectionTitle = mDirection;
+        }
+        c.close();
+        
+        // Lookup stop
+        selection = Stop.TAG + " = ? AND " + Stop.AGENCY + " = ?"; 
+        selectionArgs = new String[] {stopTag, mAgency};
+        Cursor result = mActivity.getContentResolver().query(Stop.CONTENT_URI, null, selection, selectionArgs, null);
+                
+        if (result.moveToFirst()) {
+            mStop = new Stop(result);
+            mStopLabel.setText(mStop.getTitle());
+            
+            mFavorite = isFavorite();
+        }
+        result.close();
+        
+        setHasOptionsMenu(true);
+	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        Log.i(TAG, "Starting bus prediction check");
+        // mHandler.post(new UpdateRunnable());
+        mHandler.post(new UpdateRunnable());
+    }
+    
     private boolean isFavorite() {
         boolean favorite = false;
         
@@ -231,57 +278,5 @@ public class StopFragment extends SherlockFragment {
                 Log.i(TAG, "Stopping prediction check");
             }
         }
-    }
-    
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-	@Override
-	public void onStart() {
-		super.onStart();
-		final String stopTag = getArguments().getString(ARG_STOP_TAG);
-		mAgency = getArguments().getString(ARG_AGENCY_TAG);
-		mRoute = getArguments().getString(ARG_ROUTE_TAG);
-		mDirection = getArguments().getString(ARG_DIRECTION_TAG);
-		
-        Log.i(TAG, "Loading stop with agency: " + mAgency + ",  route: " + mRoute + ", direction: " + mDirection);
-        
-        // Lookup direction
-        String selection = Direction.AGENCY + " = ? AND " + Direction.ROUTE + " = ? AND " + Direction.TAG + " = ?";
-        String[] selectionArgs = { mAgency, mRoute, mDirection };
-        Cursor c = getActivity().getContentResolver().query(Direction.CONTENT_URI, null, selection, selectionArgs, null);
-        if (c.moveToFirst()) {
-            mDirectionTitle = new Direction(c, getActivity()).getTitle();
-        } else {
-            Log.e(TAG, "Unable to lookup direction with tag " + mDirection);
-            mDirectionTitle = mDirection;
-        }
-        c.close();
-        
-        // Lookup stop
-        selection = Stop.TAG + " = ? AND " + Stop.AGENCY + " = ?"; 
-        selectionArgs = new String[] {stopTag, mAgency};
-        Cursor result = mActivity.getContentResolver().query(Stop.CONTENT_URI, null, selection, selectionArgs, null);
-                
-        if (result.moveToFirst()) {
-            mStop = new Stop(result);
-            mStopLabel.setText(mStop.getTitle());
-            
-            mFavorite = isFavorite();
-        }
-        result.close();
-        
-        setHasOptionsMenu(true);
-	}
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        
-        Log.i(TAG, "Starting bus prediction check");
-        // mHandler.post(new UpdateRunnable());
-        mHandler.post(new UpdateRunnable());
     }
 }

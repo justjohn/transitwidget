@@ -21,11 +21,15 @@ public class StopListFragment extends SherlockListFragment {
 	private SimpleCursorAdapter mAdapter;
     private Listener mListener;
     
+    public StopListFragment(Listener listener, Bundle args) {
+        super();
+        mListener = listener;
+        setArguments(args);
+    }
+    
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
     	super.onViewCreated(view, savedInstanceState);
-
-    	mListener = (Listener)getActivity();
     	
         String[] from = {Direction.TITLE};
         int[] to = {R.id.value};
@@ -48,6 +52,7 @@ public class StopListFragment extends SherlockListFragment {
     	final Activity activity = this.getActivity();
     	
     	new AsyncTask<String, Integer, Cursor>() {
+            @Override
     		protected void onPreExecute() {
     			setListShown(false);
     		}
@@ -66,6 +71,7 @@ public class StopListFragment extends SherlockListFragment {
 
     	    	return stopsCursor;
     		}
+            @Override
     		protected void onPostExecute(Cursor cursor) {
     			activity.startManagingCursor(cursor);
     			mAdapter.changeCursor(cursor);
