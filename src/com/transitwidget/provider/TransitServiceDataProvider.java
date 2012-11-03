@@ -212,7 +212,7 @@ public class TransitServiceDataProvider extends ContentProvider {
         
         long id = database.insert(table, null, values);
 
-    	Log.d(TAG, "DB: " + id + " -> " + values);
+    	// Log.d(TAG, "DB: " + id + " -> " + values);
         getContext().getContentResolver().notifyChange(baseUri, null);
     	
         return Uri.withAppendedPath(baseUri, String.valueOf(id));
