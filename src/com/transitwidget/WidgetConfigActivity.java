@@ -304,7 +304,7 @@ public class WidgetConfigActivity extends Activity {
     }
 
     void updateRoute() {
-    	if(agencySpinner.getSelectedItemPosition() >= 0) {
+    	if(agencySpinner.getSelectedItemPosition() > 0) {
     		int pos = agencySpinner.getSelectedItemPosition();
             config.setAgency((NextBusAgency) agencyAdapter.getItem(pos));
     		new UpdateRoutes().execute(config);
@@ -312,7 +312,7 @@ public class WidgetConfigActivity extends Activity {
     }
     
     void updateDirection() {
-    	if(routeSpinner.getSelectedItemPosition() >= 0) {
+    	if(routeSpinner.getSelectedItemPosition() > 0) {
     		int pos = routeSpinner.getSelectedItemPosition();
             config.setRoute((NextBusRoute) routeAdapter.getItem(pos));
     		new UpdateDirection().execute(config);
@@ -320,7 +320,7 @@ public class WidgetConfigActivity extends Activity {
     }
     
     void updateStop() {
-    	if(directionSpinner.getSelectedItemPosition() >= 0) {
+    	if(directionSpinner.getSelectedItemPosition() > 0) {
     		int pos = directionSpinner.getSelectedItemPosition();
             config.setDirection((NextBusDirection) directionAdapter.getItem(pos));
     		new UpdateEndPoint().execute(config);
