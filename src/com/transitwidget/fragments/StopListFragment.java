@@ -21,6 +21,10 @@ public class StopListFragment extends SherlockListFragment {
 	private SimpleCursorAdapter mAdapter;
     private Listener mListener;
     
+    public StopListFragment() {
+        super();
+    }
+    
     public StopListFragment(Listener listener, Bundle args) {
         super();
         mListener = listener;

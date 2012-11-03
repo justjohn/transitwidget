@@ -20,6 +20,10 @@ public class DirectionListFragment extends SherlockListFragment {
 	private SimpleCursorAdapter mAdapter;
     private Listener mListener;
     
+    public DirectionListFragment() {
+        super();
+    }
+    
     public DirectionListFragment(Listener listener, Bundle args) {
         super();
         mListener = listener;

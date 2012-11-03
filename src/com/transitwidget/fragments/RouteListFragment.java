@@ -19,6 +19,10 @@ public class RouteListFragment extends SherlockListFragment {
 	private SimpleCursorAdapter mAdapter;
     private Listener mListener;
     
+    public RouteListFragment() {
+        super();
+    }
+    
     public RouteListFragment(Listener listener, Bundle args) {
         super();
         mListener = listener;

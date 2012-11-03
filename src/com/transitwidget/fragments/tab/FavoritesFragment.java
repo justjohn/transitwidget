@@ -135,7 +135,7 @@ public class FavoritesFragment extends SherlockFragment
         if (addToBackStack) {
             ft.addToBackStack(fragment.getClass().getName());
         } else {
-            clearBackStack();
+            //clearBackStack();
         }
         ft.commit();
 

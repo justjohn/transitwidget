@@ -27,6 +27,9 @@ public class MainActivity extends SherlockFragmentActivity {
     private static final String TAG_ROUTES = "routes";
     private static final String TAG_FAVORITES = "favorites";
     
+    private static final int PAGER_ROUTE_POSITION = 0;
+    private static final int PAGER_FAVORITE_POSITION = 1;
+    
     /**
      * The tab/fragment currently active (one of TAG_ROUTES/etc...)
      */
@@ -83,7 +86,7 @@ public class MainActivity extends SherlockFragmentActivity {
                 Log.i(TAG, "Selecting tab routes");
                 mTag = TAG_ROUTES;
                 if (mViewPager.getCurrentItem() != 0) {
-                    mViewPager.setCurrentItem(0);
+                    mViewPager.setCurrentItem(PAGER_ROUTE_POSITION);
                 }
             }
         });
@@ -97,7 +100,7 @@ public class MainActivity extends SherlockFragmentActivity {
                 Log.i(TAG, "Selecting tab favorites");
                 mTag = TAG_FAVORITES;
                 if (mViewPager.getCurrentItem() != 1) {
-                    mViewPager.setCurrentItem(1);
+                    mViewPager.setCurrentItem(PAGER_FAVORITE_POSITION);
                 }
             }
         });
@@ -128,7 +131,6 @@ public class MainActivity extends SherlockFragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();     
-        String oldAgency = mAgency;
         mAgency = getSharedPreferences(PREFS, MODE_PRIVATE).getString("agencyTag", null);
         
         Log.i(TAG, "onResume with agency " + mAgency);
@@ -137,8 +139,10 @@ public class MainActivity extends SherlockFragmentActivity {
             mViewPager.setAdapter(mAdapter);
         
             if (mTag.equals(TAG_FAVORITES)) {
+                mViewPager.setCurrentItem(PAGER_FAVORITE_POSITION);
                 mActionBar.selectTab(mFavoriteTab);
             } else {
+                mViewPager.setCurrentItem(PAGER_ROUTE_POSITION);
                 mActionBar.selectTab(mRouteTab);
             }
         } else {

@@ -272,7 +272,7 @@ public class BrowseFragment extends SherlockFragment implements
         if (addToBackStack) {
             ft.addToBackStack(fragment.getClass().getName());
         } else {
-            clearBackStack();
+            //clearBackStack();
         }
         ft.commit();
 

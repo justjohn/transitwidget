@@ -25,6 +25,10 @@ public class FavoritesListFragment extends SherlockListFragment implements Loade
     
     private String mAgency;
     
+    public FavoritesListFragment() {
+        super();
+    }
+    
     public FavoritesListFragment(Listener listener, Bundle args) {
         super();
         mListener = listener;
