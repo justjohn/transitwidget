@@ -3,4 +3,7 @@
     <item android:id="@+id/menu_agency"
           android:title="@string/menuAgency"
           android:showAsAction="collapseActionView" />
+    <item android:id="@+id/menu_oss"
+          android:title="@string/menuOSS"
+          android:showAsAction="collapseActionView" />
 </menu>

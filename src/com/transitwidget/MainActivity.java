@@ -172,7 +172,12 @@ public class MainActivity extends SherlockFragmentActivity {
         switch (item.getItemId()) {
             case R.id.menu_agency:
                 selectAgency();
-                break;
+                return true;
+                
+            case R.id.menu_oss:
+                Intent intent = new Intent(this, OSSActivity.class);
+                startActivity(intent);
+                return true;
         }
         return super.onMenuItemSelected(featureId, item);
     }

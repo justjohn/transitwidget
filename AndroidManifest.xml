@@ -31,6 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name=".OSSActivity"
+            android:label="@string/oss_license_name"
+            android:theme="@style/Theme.HoloEverywhereDark.Sherlock" >
+        </activity>
 
         <activity
             android:name=".AgencySelectActivity"
