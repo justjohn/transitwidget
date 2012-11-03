@@ -5,9 +5,6 @@
     <string name="app_name">Transit Widget</string>
     <string name="oss_license_name">Open Source Licenses</string>
 
-    <!-- default agency for new users. -->
-    <string name="defaultAgency">mbta</string>
-
     <string name="menuAgency">Select Transit Agency</string>
     <string name="menuFavorite">Favorite</string>
     <string name="menuOSS">OSS Licenses</string>
