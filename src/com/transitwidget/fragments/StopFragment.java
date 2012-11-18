@@ -139,7 +139,7 @@ public class StopFragment extends SherlockFragment {
 		mRoute = getArguments().getString(ARG_ROUTE_TAG);
 		mDirection = getArguments().getString(ARG_DIRECTION_TAG);
 		
-        Log.i(TAG, "Loading stop with agency: " + mAgency + ",  route: " + mRoute + ", direction: " + mDirection);
+        // Log.i(TAG, "Loading stop with agency: " + mAgency + ",  route: " + mRoute + ", direction: " + mDirection);
         
         // Lookup direction
         String selection = Direction.AGENCY + " = ? AND " + Direction.ROUTE + " = ? AND " + Direction.TAG + " = ?";
@@ -148,7 +148,7 @@ public class StopFragment extends SherlockFragment {
         if (c.moveToFirst()) {
             mDirectionTitle = new Direction(c, getActivity()).getTitle();
         } else {
-            Log.e(TAG, "Unable to lookup direction with tag " + mDirection);
+            Log.w(TAG, "Unable to lookup direction with tag " + mDirection);
             mDirectionTitle = mDirection;
         }
         c.close();
@@ -172,9 +172,6 @@ public class StopFragment extends SherlockFragment {
     @Override
     public void onResume() {
         super.onResume();
-        
-        Log.i(TAG, "Starting bus prediction check");
-        // mHandler.post(new UpdateRunnable());
         mHandler.post(new UpdateRunnable());
     }
     
@@ -197,8 +194,9 @@ public class StopFragment extends SherlockFragment {
         @Override
         protected List<BusPrediction> doInBackground(String... params) {
             // Update the data, send notification
-            List<BusPrediction> predictions = new NextBusAPI().getPredictions(mAgency, mStop.getTag(), mDirection, mRoute);
-            Log.i(TAG, "Got predictions: " + predictions);
+            NextBusAPI api = new NextBusAPI();
+            List<BusPrediction> predictions = api.getPredictions(mAgency, mStop.getTag(), mDirection, mRoute);
+            // Log.i(TAG, "Got predictions: " + predictions);
             if (predictions == null) {
                 Log.w(TAG, "Unable to load predictions");
                 return null;
@@ -208,7 +206,6 @@ public class StopFragment extends SherlockFragment {
         }
         @Override
         protected void onPostExecute(List<BusPrediction> predictions) {
-            Log.i(TAG, "Got bus predictions: " + predictions);
             mPredictions = predictions;
             updateUI();
         }

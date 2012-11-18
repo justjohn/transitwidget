@@ -1,22 +1,17 @@
 package com.transitwidget.feed;
 
+import android.util.Log;
+import com.transitwidget.feed.model.Direction;
+import com.transitwidget.feed.model.Stop;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
-
-import com.transitwidget.feed.model.Direction;
-import com.transitwidget.feed.model.Stop;
-
-
-import android.util.Log;
 
 public class RouteConfigFeedParser extends FeedParser {
 	private static final String TAG = RouteConfigFeedParser.class.getName();

@@ -1,11 +1,10 @@
 package com.transitwidget.api;
 
-import java.util.List;
-
 import com.transitwidget.feed.model.Agency;
 import com.transitwidget.feed.model.BusPrediction;
 import com.transitwidget.feed.model.Direction;
 import com.transitwidget.feed.model.Route;
+import java.util.List;
 
 public interface ServiceAPI {
 	public String getName();

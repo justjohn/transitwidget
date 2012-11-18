@@ -98,6 +98,6 @@ public class PredictionFeedParser extends FeedParser {
 	}
 
 	public static String getPredictionUrl(String agency, String stopTag, String routeTag) {
-		return getCommandUrl("predictions", agency) + "&stopId=" + stopTag + "&routeTag=" + routeTag;
+		return getCommandUrl("predictions", agency) + "&s=" + stopTag + "&r=" + routeTag;
 	}
 }
